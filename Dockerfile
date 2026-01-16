@@ -28,7 +28,7 @@ RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
     
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
-COPY servers/nextjs/package.json cemros-presenton/servers/nextjs/package-lock.json ./
+COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
 RUN npm install
 
 # Copy Next.js app
