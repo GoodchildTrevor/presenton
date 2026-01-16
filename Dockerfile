@@ -6,12 +6,13 @@ RUN apt update && apt install -y \
     curl \
     libreoffice \
     fontconfig \
-    chromium
+    chromium \
+    ca-certificates \
+    gnupg
 
 # Install Node.js 20 using NodeSource repository
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get install -y npm
+    apt-get install -y nodejs  # npm установится автоматически
 
 # Create a working directory
 WORKDIR /app  
