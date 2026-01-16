@@ -28,11 +28,11 @@ RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
     
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
-COPY cemros-presenton/servers/nextjs/package.json cemros-presenton/servers/nextjs/package-lock.json ./
+COPY servers/nextjs/package.json cemros-presenton/servers/nextjs/package-lock.json ./
 RUN npm install
 
 # Copy Next.js app
-COPY cemros-presenton/servers/nextjs/ /app/servers/nextjs/
+COPY servers/nextjs/ /app/servers/nextjs/
 
 # Build the Next.js app
 WORKDIR /app/servers/nextjs
@@ -41,11 +41,11 @@ RUN npm run build
 WORKDIR /app
 
 # Copy FastAPI
-COPY cemros-presenton/servers/fastapi/ ./servers/fastapi/
-COPY cemros-presenton/start.js ./
+COPY servers/fastapi/ ./servers/fastapi/
+COPY start.js ./
 
 # Copy nginx configuration
-COPY cemros-presenton/nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose the port
 EXPOSE 80
