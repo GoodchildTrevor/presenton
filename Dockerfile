@@ -1,13 +1,5 @@
 FROM python:3.12-slim-bookworm
 
-COPY resources/certs/eurocement_root_ca.crt /usr/local/share/ca-certificates/
-COPY resources/certs/eurocement_issuing_subca.crt /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-
-COPY resources/apt/sources.list /etc/apt/sources.list
-
-COPY resources/pip.conf /etc/pip.conf
-
 # Install Node.js and npm
 RUN apt update && apt install -y \
     nginx \
