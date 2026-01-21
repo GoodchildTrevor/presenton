@@ -4,18 +4,13 @@ FROM node:20-alpine AS nextjs-builder
 WORKDIR /app
 
 # Копируем package.json
-COPY cemros-presenton/servers/nextjs/package*.json ./
-
-# Проверяем, что файлы скопированы
-RUN echo "=== Проверка package.json ===" && \
-    cat package.json && \
-    echo "============================="
+COPY servers/nextjs/package*.json ./
 
 # Устанавливаем зависимости
 RUN npm ci --no-audit --no-fund --loglevel=verbose
 
 # Копируем исходный код
-COPY cemros-presenton/servers/nextjs/ ./
+COPY servers/nextjs/ ./
 
 # Проверяем доступность next
 RUN which next || echo "next не в PATH" && \
@@ -82,10 +77,9 @@ RUN pip install --no-cache-dir \
     chromadb \
     openai
 
-# Копируем остальное
-COPY cemros-presenton/servers/fastapi/ ./servers/fastapi/
-COPY cemros-presenton/start.js ./
-COPY cemros-presenton/nginx.conf /etc/nginx/nginx.conf
+COPY servers/fastapi/ ./servers/fastapi/
+COPY start.js ./
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Проверяем Next.js
 RUN cd /app/servers/nextjs && \
