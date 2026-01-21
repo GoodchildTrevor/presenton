@@ -3,6 +3,9 @@ FROM node:20-alpine AS nextjs-builder
 
 WORKDIR /app
 
+RUN npm config set registry https://registry.npmmirror.com/ \
+    && npm config set strict-ssl false
+
 # Копируем package.json
 COPY servers/nextjs/package*.json ./
 
