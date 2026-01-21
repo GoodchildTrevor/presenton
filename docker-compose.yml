@@ -10,6 +10,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    container_name: presenton
     ports:
       # You can replace 5000 with any other port number of your choice to run Presenton on a different port number.
       - "5000:80"
