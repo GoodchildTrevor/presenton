@@ -21,16 +21,19 @@ ENV APP_DATA_DIRECTORY=/app_data
 ENV TEMP_DIRECTORY=/tmp/presenton
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Install dependencies for FastAPI
+# Install FastAPI and other deps
 RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
     pathvalidate pdfplumber chromadb sqlmodel aiofiles \
     anthropic google-genai openai fastmcp dirtyjson
-RUN pip install torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cpu \
-    --timeout 300
 
-RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
-    --timeout 300
+# Install PyTorch CPU wheels explicitly, without torchaudio
+RUN pip install \
+    "https://download.pytorch.org/whl/cpu/torch-2.6.0%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl" \
+    "https://download.pytorch.org/whl/cpu/torchvision-0.21.0%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl" \
+    --timeout 600
+
+# Install docling (torch already satisfied)
+RUN pip install docling --timeout 600
 
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
