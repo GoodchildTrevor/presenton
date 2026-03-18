@@ -39,7 +39,7 @@ RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
 COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
-RUN npm install
+RUN npm install --loglevel info
 
 # Copy Next.js app
 COPY servers/nextjs/ /app/servers/nextjs/
