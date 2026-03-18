@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     fontconfig \
     chromium
 
-
 # Install Node.js 20 using NodeSource repository
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
@@ -26,12 +25,12 @@ RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
     pathvalidate pdfplumber chromadb sqlmodel aiofiles \
     anthropic google-genai openai fastmcp dirtyjson
 
-# Robust PyTorch CPU install with retries, no torchaudio
-RUN for i in 1 2 3 4 5; do \
-    pip install torch torchvision \
-        --index-url https://download.pytorch.org/whl/cpu \
-        --timeout 600 && break || sleep 15; \
-    done
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+COPY vendor/torchvision-0.25.0+cpu-cp311-cp311-manylinux_2_28_x86_64.whl /tmp/
+
+# Установить torchvision из файла (без сети)
+RUN pip install /tmp/torchvision-0.25.0+cpu-cp311-cp311-manylinux_2_28_x86_64.whl
 
 # Install docling (will see already-installed torch)
 RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
