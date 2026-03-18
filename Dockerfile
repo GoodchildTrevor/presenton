@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
-
 # Create a working directory
 WORKDIR /app  
 
@@ -26,13 +25,17 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
     pathvalidate pdfplumber chromadb sqlmodel aiofiles \
     anthropic google-genai openai fastmcp dirtyjson
-RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cpu \
+    --timeout 300
+
+RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
+    --timeout 300
 
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
 COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
 RUN npm install
-
 
 # Copy Next.js app
 COPY servers/nextjs/ /app/servers/nextjs/
