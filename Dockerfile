@@ -39,6 +39,12 @@ RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
 COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
+
+# Skip heavy binary downloads
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV CYPRESS_INSTALL_BINARY=0
+
 RUN npm install --loglevel info
 
 # Copy Next.js app
