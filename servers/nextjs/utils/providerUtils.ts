@@ -28,19 +28,8 @@ export const updateLLMConfig = (
   value: string | boolean
 ): LLMConfig => {
   const fieldMappings: Record<string, keyof LLMConfig> = {
-    openai_api_key: "OPENAI_API_KEY",
-    openai_model: "OPENAI_MODEL",
-    google_api_key: "GOOGLE_API_KEY",
-    google_model: "GOOGLE_MODEL",
-    anthropic_api_key: "ANTHROPIC_API_KEY",
-    anthropic_model: "ANTHROPIC_MODEL",
     ollama_url: "OLLAMA_URL",
     ollama_model: "OLLAMA_MODEL",
-    custom_llm_url: "CUSTOM_LLM_URL",
-    custom_llm_api_key: "CUSTOM_LLM_API_KEY",
-    custom_model: "CUSTOM_MODEL",
-    pexels_api_key: "PEXELS_API_KEY",
-    pixabay_api_key: "PIXABAY_API_KEY",
     image_provider: "IMAGE_PROVIDER",
     disable_image_generation: "DISABLE_IMAGE_GENERATION",
     use_custom_url: "USE_CUSTOM_URL",
@@ -48,10 +37,7 @@ export const updateLLMConfig = (
     disable_thinking: "DISABLE_THINKING",
     extended_reasoning: "EXTENDED_REASONING",
     web_grounding: "WEB_GROUNDING",
-    comfyui_url: "COMFYUI_URL",
-    comfyui_workflow: "COMFYUI_WORKFLOW",
-    dall_e_3_quality: "DALL_E_3_QUALITY",
-    gpt_image_1_5_quality: "GPT_IMAGE_1_5_QUALITY",
+    flux_url: "FLUX_URL",
   };
 
   const configKey = fieldMappings[field];
@@ -72,12 +58,8 @@ export const changeProvider = (
   const newConfig = { ...currentConfig, LLM: provider };
 
   // Auto Select appropriate image provider based on the text models
-  if (provider === "openai") {
-    newConfig.IMAGE_PROVIDER = "gpt-image-1.5";
-  } else if (provider === "google") {
-    newConfig.IMAGE_PROVIDER = "gemini_flash";
-  } else {
-    newConfig.IMAGE_PROVIDER = "pexels"; // default for ollama and custom
+  if (provider === "ollama") {
+    newConfig.IMAGE_PROVIDER = "flux"; // default for ollama
   }
 
   return newConfig;

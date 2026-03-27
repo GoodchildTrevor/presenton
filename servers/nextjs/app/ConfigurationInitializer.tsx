@@ -39,7 +39,7 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
       const response = await fetch('/api/user-config');
       const llmConfig = await response.json();
       if (!llmConfig.LLM) {
-        llmConfig.LLM = 'openai';
+        llmConfig.LLM = 'ollama';
       }
       dispatch(setLLMConfig(llmConfig));
       const isValid = hasValidLLMConfig(llmConfig);
@@ -53,17 +53,9 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
             return;
           }
         }
-        if (llmConfig.LLM === 'custom') {
-          const isAvailable = await checkIfSelectedCustomModelIsAvailable(llmConfig);
-          if (!isAvailable) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
-            return;
-          }
-        }
         if (route === '/') {
-          router.push('/upload');
-          setLoadingToFalseAfterNavigatingTo('/upload');
+          router.push('/');
+          setLoadingToFalseAfterNavigatingTo('/');
         } else {
           setIsLoading(false);
         }
@@ -75,8 +67,8 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
       }
     } else {
       if (route === '/') {
-        router.push('/upload');
-        setLoadingToFalseAfterNavigatingTo('/upload');
+        router.push('/');
+        setLoadingToFalseAfterNavigatingTo('/');
       } else {
         setIsLoading(false);
       }
@@ -84,25 +76,6 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
   }
 
 
-  const checkIfSelectedCustomModelIsAvailable = async (llmConfig: LLMConfig) => {
-    try {
-      const response = await fetch('/api/v1/ppt/openai/models/available', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: llmConfig.CUSTOM_LLM_URL,
-          api_key: llmConfig.CUSTOM_LLM_API_KEY,
-        }),
-      });
-      const data = await response.json();
-      return data.includes(llmConfig.CUSTOM_MODEL);
-    } catch (error) {
-      console.error('Error fetching custom models:', error);
-      return false;
-    }
-  }
 
 
   if (isLoading) {

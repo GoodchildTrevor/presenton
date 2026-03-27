@@ -11,13 +11,13 @@ export async function GET() {
     try {
       const raw = fs.readFileSync(userConfigPath, "utf-8");
       const cfg = JSON.parse(raw || "{}");
-      keyFromFile = cfg?.OPENAI_API_KEY || "";
+      keyFromFile = cfg?.OLLAMA_MODEL || "";
     } catch { }
   }
 
 
 
-  const keyFromEnv = process.env.OPENAI_API_KEY || "";
+  const keyFromEnv = process.env.OLLAMA_MODEL || "";
   console.log(keyFromEnv);
   const hasKey = Boolean((keyFromFile || keyFromEnv).trim());
 
