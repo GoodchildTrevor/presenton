@@ -46,7 +46,6 @@ export default function Home() {
     showProgress: false
   });
 
-  const canChangeKeys = config.can_change_keys;
   const downloadProgress = useMemo(() => {
     if (downloadingModel && downloadingModel.downloaded !== null && downloadingModel.size !== null) {
       return Math.round((downloadingModel.downloaded / downloadingModel.size) * 100);
@@ -132,16 +131,6 @@ export default function Home() {
       }, 2000);
     }
   }, [downloadingModel]);
-
-  useEffect(() => {
-    if (!canChangeKeys) {
-      router.push("/upload");
-    }
-  }, [canChangeKeys, router]);
-
-  if (!canChangeKeys) {
-    return null;
-  }
 
   return (
     <div className="h-screen bg-gradient-to-b font-instrument_sans from-gray-50 to-white flex flex-col overflow-hidden">

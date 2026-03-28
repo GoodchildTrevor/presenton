@@ -98,7 +98,7 @@ const LayoutPreview = () => {
       <div className=" sticky top-0 z-30">
         <div className="max-w-7xl mx-auto border-b px-6 py-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">All Templates</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Все шаблоны</h1>
             <p className="text-gray-600 mt-2">
               {layoutTemplates.length} templates
             </p>
@@ -113,7 +113,7 @@ const LayoutPreview = () => {
                 trackEvent(MixpanelEvent.Navigation, { from: pathname, to: `/custom-template` });
                 router.push(`/custom-template`)
               }}>
-                Create Custom Template
+                Создать свой шаблон
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -193,14 +193,14 @@ const LayoutPreview = () => {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-lg font-semibold text-gray-900 capitalize group-hover:text-blue-600 transition-colors">
-                        Create Custom Template
+                        Создайте свой шаблон
                       </h3>
                       <div className="flex items-center gap-2">
                         <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mb-4">
-                      Create your first custom template
+                      Создайте свой первый шаблон
                     </p>
                   </div>
                 </Card>
@@ -212,7 +212,7 @@ const LayoutPreview = () => {
         {/* In Built Templates */}
         <section className="h-full pt-8 flex justify-center items-center">
           <div className="max-w-7xl mx-auto px-6 py-6 w-full">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Inbuilt Templates</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Готовые шаблоны</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {inBuiltTemplates.map((template) => {
                 const isCustom = template.templateID.toLowerCase().startsWith("custom-");

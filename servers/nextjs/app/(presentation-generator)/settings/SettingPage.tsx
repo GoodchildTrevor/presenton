@@ -32,7 +32,6 @@ const SettingsPage = () => {
   const [llmConfig, setLlmConfig] = useState<LLMConfig>(
     userConfigState.llm_config
   );
-  const canChangeKeys = userConfigState.can_change_keys;
   const [buttonState, setButtonState] = useState<ButtonState>({
     isLoading: false,
     isDisabled: false,
@@ -141,16 +140,6 @@ const SettingsPage = () => {
       }, 2000);
     }
   }, [downloadingModel]);
-
-  useEffect(() => {
-    if (!canChangeKeys) {
-      router.push("/dashboard");
-    }
-  }, [canChangeKeys, router]);
-
-  if (!canChangeKeys) {
-    return null;
-  }
 
   return (
     <div className="h-screen bg-gradient-to-b font-instrument_sans from-gray-50 to-white flex flex-col overflow-hidden">

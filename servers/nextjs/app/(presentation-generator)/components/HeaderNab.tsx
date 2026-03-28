@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 
 const HeaderNav = () => {
 
-  const canChangeKeys = useSelector((state: RootState) => state.userConfig.can_change_keys);
   const pathname = usePathname();
 
   return (
@@ -24,10 +23,9 @@ const HeaderNav = () => {
       >
         <LayoutDashboard className="w-5 h-5" />
         <span className="text-sm font-medium font-inter">
-          Dashboard
+          Презентации
         </span>
       </Link>
-      {canChangeKeys && (
         <Link
           href="/settings"
           prefetch={false}
@@ -37,10 +35,9 @@ const HeaderNav = () => {
         >
           <Settings className="w-5 h-5" />
           <span className="text-sm font-medium font-inter">
-            Settings
+             Настройки
           </span>
         </Link>
-      )}
     </div>
   );
 };

@@ -186,7 +186,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
         </div>
         {customTemplates.length === 0 ? (
           <div className="text-sm text-gray-600 py-2">
-            No custom templates. Create one from "All Templates" menu.
+            Нет своих шаблонов. Создайте первый выбрав "Шаблоны" в меню.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
