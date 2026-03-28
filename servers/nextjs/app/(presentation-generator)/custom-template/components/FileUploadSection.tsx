@@ -36,17 +36,17 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Upload className="w-5 h-5" />
-          Upload PDF or PPTX File
+          Загрузите PDF или PPTX файл
         </CardTitle>
         <CardDescription>
-          Select a PDF or PowerPoint file (.pdf or .pptx) to process. Maximum file size: 100MB
+          Выберете PDF или PowerPoint файл (.pdf or .pptx) для обработки. Максимальный размер файла: 100MB
         </CardDescription>
         {slides.length > 0 && (
           <div className="flex items-center justify-end gap-2">
             {slides.some((s) => s.processing) && (
               <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             )}
-            {completedSlides}/{slides.length} slides completed
+            {completedSlides}/{slides.length} слайдов обработано
           </div>
         )}
       </CardHeader>
@@ -56,7 +56,7 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <Label htmlFor="file-upload" className="cursor-pointer">
               <span className="text-lg font-medium text-gray-700">
-                Click to upload a PDF or PPTX file
+                Кликните, чтобы загрузить PDF или PPTX файл
               </span>
               <input
                 id="file-upload"
@@ -67,7 +67,7 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               />
             </Label>
             <p className="text-sm text-gray-500 mt-2">
-              Drag and drop your file here or click to browse
+              Перетащите файл или кликните на кнопку ниже
             </p>
           </div>
         ) : (
