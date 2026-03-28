@@ -25,14 +25,6 @@ export async function GET() {
   const configData = fs.readFileSync(userConfigPath, "utf-8");
   let config = JSON.parse(configData);
 
-  // Autofill FLUX_URL from environment variable if FLUX is selected but URL is missing
-  if (config.IMAGE_PROVIDER === "flux" && !config.FLUX_URL) {
-    const fluxUrlFromEnv = process.env.FLUX_URL;
-    if (fluxUrlFromEnv) {
-      config.FLUX_URL = fluxUrlFromEnv;
-    }
-  }
-
   return NextResponse.json(config);
 }
 

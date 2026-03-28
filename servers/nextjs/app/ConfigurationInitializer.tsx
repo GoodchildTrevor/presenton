@@ -41,6 +41,12 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
       if (!llmConfig.LLM) {
         llmConfig.LLM = 'ollama';
       }
+      
+      // Pass FLUX_URL to window object for client-side access
+      if (typeof window !== 'undefined' && llmConfig.FLUX_URL) {
+        (window as any).FLUX_URL = llmConfig.FLUX_URL;
+      }
+      
       dispatch(setLLMConfig(llmConfig));
       const isValid = hasValidLLMConfig(llmConfig);
       if (isValid) {

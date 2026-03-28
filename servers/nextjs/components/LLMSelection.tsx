@@ -113,6 +113,17 @@ export default function LLMProviderSelection({
         updates.OLLAMA_URL = "http://localhost:11434";
       }
 
+      // Autofill FLUX_URL from environment variable if FLUX is selected but URL is missing
+      if (!prevConfig.DISABLE_IMAGE_GENERATION &&
+          prevConfig.IMAGE_PROVIDER === "flux" &&
+          !prevConfig.FLUX_URL) {
+        // Try to get FLUX_URL from window object (set by server-side rendering)
+        const fluxUrlFromWindow = (typeof window !== 'undefined' && (window as any).FLUX_URL) || undefined;
+        if (fluxUrlFromWindow) {
+          updates.FLUX_URL = fluxUrlFromWindow;
+        }
+      }
+
       if (Object.keys(updates).length === 0) {
         return prevConfig;
       }

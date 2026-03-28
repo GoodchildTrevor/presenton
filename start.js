@@ -103,6 +103,7 @@ const setupUserConfigFromEnv = () => {
       process.env.DALL_E_3_QUALITY || existingConfig.DALL_E_3_QUALITY,
     GPT_IMAGE_1_5_QUALITY:
       process.env.GPT_IMAGE_1_5_QUALITY || existingConfig.GPT_IMAGE_1_5_QUALITY,
+    FLUX_URL: process.env.FLUX_URL || existingConfig.FLUX_URL,
   };
 
   writeFileSync(userConfigPath, JSON.stringify(userConfig));

@@ -87,8 +87,8 @@ export default function Home() {
         text: "Save Configuration"
       }));
       // Track navigation from -> to
-      trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/upload" });
-      router.push("/upload");
+      trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/" });
+      router.push("/");
     } catch (error) {
       toast.info(error instanceof Error ? error.message : "Failed to save configuration");
       setButtonState(prev => ({

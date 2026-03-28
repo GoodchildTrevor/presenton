@@ -103,3 +103,7 @@ def set_dall_e_3_quality_env(value):
 
 def set_gpt_image_1_5_quality_env(value):
     os.environ["GPT_IMAGE_1_5_QUALITY"] = value
+
+
+def set_flux_url_env(value):
+    os.environ["FLUX_URL"] = value

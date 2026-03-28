@@ -13,6 +13,7 @@ from utils.get_env import (
     get_image_provider_env,
     get_extended_reasoning_env,
     get_web_grounding_env,
+    get_flux_url_env,
 )
 from utils.parsers import parse_bool_or_none
 from utils.set_env import (
@@ -27,6 +28,7 @@ from utils.set_env import (
     set_disable_image_generation_env,
     set_disable_thinking_env,
     set_extended_reasoning_env,
+    set_flux_url_env,
     set_google_api_key_env,
     set_google_model_env,
     set_gpt_image_1_5_quality_env,
@@ -60,6 +62,7 @@ def get_user_config():
         OLLAMA_URL=existing_config.OLLAMA_URL or get_ollama_url_env(),
         OLLAMA_MODEL=existing_config.OLLAMA_MODEL or get_ollama_model_env(),
         IMAGE_PROVIDER=existing_config.IMAGE_PROVIDER or get_image_provider_env(),
+        FLUX_URL=existing_config.FLUX_URL or get_flux_url_env(),
         DISABLE_IMAGE_GENERATION=(
             existing_config.DISABLE_IMAGE_GENERATION
             if existing_config.DISABLE_IMAGE_GENERATION is not None
@@ -106,6 +109,8 @@ def update_env_with_user_config():
         set_disable_image_generation_env(str(user_config.DISABLE_IMAGE_GENERATION))
     if user_config.IMAGE_PROVIDER:
         set_image_provider_env(user_config.IMAGE_PROVIDER)
+    if user_config.FLUX_URL:
+        set_flux_url_env(user_config.FLUX_URL)
     if user_config.TOOL_CALLS is not None:
         set_tool_calls_env(str(user_config.TOOL_CALLS))
     if user_config.DISABLE_THINKING is not None:

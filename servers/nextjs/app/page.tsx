@@ -1,8 +1,17 @@
-import Home from "@/components/Home"
+import UploadPage from "./(presentation-generator)/upload/components/UploadPage";
+import Header from "./(presentation-generator)/dashboard/components/Header";
 
 const page = () => {
     return (
-        <Home />
+        <div className="relative">
+            <Header />
+            <div className="flex flex-col items-center justify-center py-8">
+                <h1 className="text-3xl font-semibold font-instrument_sans">
+                    Create Presentation{" "}
+                </h1>
+            </div>
+            <UploadPage />
+        </div>
     )
 }
 
