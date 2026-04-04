@@ -35,7 +35,7 @@ const SettingsPage = () => {
   const [buttonState, setButtonState] = useState<ButtonState>({
     isLoading: false,
     isDisabled: false,
-    text: "Save Configuration",
+    text: "Сохранить настройки",
     showProgress: false,
   });
 
@@ -68,7 +68,7 @@ const SettingsPage = () => {
         ...prev,
         isLoading: true,
         isDisabled: true,
-        text: "Saving Configuration...",
+        text: "Сохраняем настройки...",
       }));
       trackEvent(MixpanelEvent.Settings_SaveConfiguration_API_Call);
       await handleSaveLLMConfig(llmConfig);
@@ -83,22 +83,22 @@ const SettingsPage = () => {
           await handleModelDownload();
         }
       }
-      toast.info("Configuration saved successfully");
+      toast.info("Настройки успешно сохранены");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить настройки",
       }));
       trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/upload" });
       router.push("/upload");
     } catch (error) {
-      toast.info(error instanceof Error ? error.message : "Failed to save configuration");
+      toast.info(error instanceof Error ? error.message : "Не удалось сохранить настройки");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить настройки",
       }));
     }
   };
@@ -125,7 +125,7 @@ const SettingsPage = () => {
       setButtonState({
         isLoading: true,
         isDisabled: true,
-        text: `Downloading Model (${percentage}%)`,
+        text: `Загрузка модели (${percentage}%)`,
         showProgress: true,
         progressPercentage: percentage,
         status: downloadingModel.status,
@@ -136,7 +136,7 @@ const SettingsPage = () => {
       setTimeout(() => {
         setShowDownloadModal(false);
         setDownloadingModel(null);
-        toast.info("Model downloaded successfully!");
+        toast.info("Модель успешно загружена!");
       }, 2000);
     }
   }, [downloadingModel]);
@@ -198,8 +198,8 @@ const SettingsPage = () => {
               {/* Title */}
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {downloadingModel.done
-                  ? "Download Complete!"
-                  : "Downloading Model"}
+                  ? "Загрузка завершена!"
+                  : "Загрузка модели"}
               </h3>
 
               {/* Model Name */}
@@ -217,7 +217,7 @@ const SettingsPage = () => {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {downloadProgress}% Complete
+                    {downloadProgress}% загружено
                   </p>
                 </div>
               )}
@@ -237,11 +237,11 @@ const SettingsPage = () => {
                 downloadingModel.status !== "pulled" && (
                   <div className="text-xs text-gray-500">
                     {downloadingModel.status === "downloading" &&
-                      "Downloading model files..."}
+                      "Загрузка файлов модели..."}
                     {downloadingModel.status === "verifying" &&
-                      "Verifying model integrity..."}
+                      "Проверка целостности модели..."}
                     {downloadingModel.status === "pulling" &&
-                      "Pulling model from registry..."}
+                      "Получение модели из реестра..."}
                   </div>
                 )}
 
@@ -250,13 +250,13 @@ const SettingsPage = () => {
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                   <div className="flex justify-between text-xs text-gray-600">
                     <span>
-                      Downloaded:{" "}
+                      Загружено:{" "}
                       {(downloadingModel.downloaded / 1024 / 1024).toFixed(1)}{" "}
-                      MB
+                      МБ
                     </span>
                     <span>
-                      Total: {(downloadingModel.size / 1024 / 1024).toFixed(1)}{" "}
-                      MB
+                      Всего: {(downloadingModel.size / 1024 / 1024).toFixed(1)}{" "}
+                      МБ
                     </span>
                   </div>
                 </div>
