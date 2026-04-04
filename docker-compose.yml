@@ -29,6 +29,11 @@ services:
       - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
       - OLLAMA_URL=${OLLAMA_URL}
       - OLLAMA_MODEL=${OLLAMA_MODEL}
+      # Comma-separated list of Ollama models available to users.
+      # Only models that are actually pulled in Ollama will appear in the list.
+      # If empty or not set — all pulled models are available.
+      # Example: MODELS_FOR_USERS=gemma3:4b,qwen2.5:7b
+      - MODELS_FOR_USERS=${MODELS_FOR_USERS}
       - CUSTOM_LLM_URL=${CUSTOM_LLM_URL}
       - CUSTOM_LLM_API_KEY=${CUSTOM_LLM_API_KEY}
       - CUSTOM_MODEL=${CUSTOM_MODEL}
@@ -69,6 +74,7 @@ services:
   #     - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
   #     - OLLAMA_URL=${OLLAMA_URL}
   #     - OLLAMA_MODEL=${OLLAMA_MODEL}
+  #     - MODELS_FOR_USERS=${MODELS_FOR_USERS}
   #     - CUSTOM_LLM_URL=${CUSTOM_LLM_URL}
   #     - CUSTOM_LLM_API_KEY=${CUSTOM_LLM_API_KEY}
   #     - CUSTOM_MODEL=${CUSTOM_MODEL}
