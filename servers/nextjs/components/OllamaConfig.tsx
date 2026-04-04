@@ -50,11 +50,11 @@ export default function OllamaConfig({
       } else {
         console.error('Failed to fetch Ollama models');
         setOllamaModels([]);
-        toast.error('Failed to fetch Ollama models');
+        toast.error('Не удалось получить список моделей Ollama');
       }
     } catch (error) {
       console.error('Error fetching Ollama models:', error);
-      toast.error('Error fetching Ollama models');
+      toast.error('Ошибка при получении моделей Ollama');
       setOllamaModels([]);
     } finally {
       setOllamaModelsLoading(false);
@@ -71,7 +71,7 @@ export default function OllamaConfig({
       <div>
         <div className="flex items-center justify-between mb-4 bg-green-50 p-2 rounded-sm">
           <label className="text-sm font-medium text-gray-700">
-            Use custom Ollama URL
+            Использовать свой URL Ollama
           </label>
           <Switch
             checked={useCustomUrl}
@@ -81,13 +81,13 @@ export default function OllamaConfig({
         {useCustomUrl && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ollama URL
+              URL Ollama
             </label>
             <div className="relative">
               <input
                 type="text"
                 required
-                placeholder="Enter your Ollama URL"
+                placeholder="Введите URL Ollama"
                 className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 value={ollamaUrl}
                 onChange={(e) => onInputChange(e.target.value, "ollama_url")}
@@ -95,7 +95,7 @@ export default function OllamaConfig({
             </div>
             <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
               <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-              Change this if you are using a custom Ollama instance
+              Измените, если используете свой экземпляр Ollama
             </p>
           </div>
         )}
@@ -104,14 +104,14 @@ export default function OllamaConfig({
       {/* Model Selection */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          Choose a supported model
+          Выберите поддерживаемую модель
         </label>
         <div className="w-full">
           {ollamaModelsLoading ? (
             <div className="w-full h-12 px-4 py-4 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
-                <span className="text-sm text-gray-600">Loading models...</span>
+                <span className="text-sm text-gray-600">Загрузка моделей...</span>
               </div>
             </div>
           ) : ollamaModels && ollamaModels.length > 0 ? (
@@ -132,7 +132,7 @@ export default function OllamaConfig({
                         ? ollamaModels?.find(
                           (m) => m.value === ollamaModel
                         )?.label || ollamaModel
-                        : "Select a model"}
+                        : "Выберите модель"}
                     </span>
                     {ollamaModel && (
                       <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
@@ -153,9 +153,9 @@ export default function OllamaConfig({
                 style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
-                  <CommandInput placeholder="Search model..." />
+                  <CommandInput placeholder="Поиск модели..." />
                   <CommandList>
-                    <CommandEmpty>No model found.</CommandEmpty>
+                    <CommandEmpty>Модель не найдена.</CommandEmpty>
                     <CommandGroup>
                       {ollamaModels?.map((model, index) => (
                         <CommandItem
@@ -207,10 +207,10 @@ export default function OllamaConfig({
         </div>
         {(!ollamaModels || ollamaModels.length === 0) && !ollamaModelsLoading && (
           <p className="mt-2 text-sm text-gray-500">
-            No models available. Please check your Ollama connection.
+            Модели недоступны. Проверьте подключение к Ollama.
           </p>
         )}
       </div>
     </div>
   );
-} 
+}
