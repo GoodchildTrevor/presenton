@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { setPresentationData } from "@/store/slices/presentationGeneration";
+import { setPresentationData, setStreaming } from "@/store/slices/presentationGeneration";
 import { DashboardApi } from '../../services/api/dashboard';
-import {  clearHistory } from "@/store/slices/undoRedoSlice";
+import { clearHistory } from "@/store/slices/undoRedoSlice";
 
 
 export const usePresentationData = (
@@ -18,11 +18,13 @@ export const usePresentationData = (
       const data = await DashboardApi.getPresentation(presentationId);
       if (data) {
         dispatch(setPresentationData(data));
+        dispatch(setStreaming(false));
         dispatch(clearHistory());
         setLoading(false);
       }
     } catch (error) {
       setError(true);
+      dispatch(setStreaming(false));
       toast.error("Failed to load presentation");
       console.error("Error fetching user slides:", error);
       setLoading(false);
