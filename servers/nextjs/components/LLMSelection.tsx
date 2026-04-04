@@ -71,21 +71,12 @@ export default function LLMProviderSelection({
         needsOllamaUrl ||
         needsFluxUrl,
       text: needsModelSelection
-<<<<<<< HEAD
-        ? "Пожалуйста, выберите модель"
-        : needsOllamaUrl
-        ? "Пожалуйста, введите URL Ollama"
-        : needsFluxUrl
-        ? "Пожалуйста, введите URL FLUX"
-        : "Сохранить конфигурацию",
-=======
         ? "Выберите модель"
         : needsOllamaUrl
         ? "Введите URL Ollama"
         : needsFluxUrl
         ? "Введите URL FLUX"
         : "Сохранить настройки",
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
       showProgress: false,
     });
   }, [llmConfig]);
@@ -190,11 +181,7 @@ export default function LLMProviderSelection({
           </div>
           <p className="text-sm text-gray-500 flex items-center gap-2">
             <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-<<<<<<< HEAD
-            Если включено, слайды не будут содержать автоматически созданные изображения.
-=======
             При включении слайды не будут содержать автоматически сгенерированные изображения.
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
           </p>
         </div>
 
@@ -203,11 +190,7 @@ export default function LLMProviderSelection({
             {/* Выбор провайдера изображений */}
             <div className="my-8">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-<<<<<<< HEAD
-                Выберите провайдера изображений
-=======
                 Выберите провайдер изображений
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
               </label>
               <div className="w-full">
                 <Popover
@@ -226,11 +209,7 @@ export default function LLMProviderSelection({
                           {llmConfig.IMAGE_PROVIDER
                             ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]
                                 ?.label || llmConfig.IMAGE_PROVIDER
-<<<<<<< HEAD
-                            : "Выберите провайдера"}
-=======
                             : "Выберите провайдер"}
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
                         </span>
                       </div>
                       <ChevronsUpDown className="w-4 h-4 text-gray-500" />
