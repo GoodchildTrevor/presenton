@@ -35,7 +35,7 @@ const SettingsPage = () => {
   const [buttonState, setButtonState] = useState<ButtonState>({
     isLoading: false,
     isDisabled: false,
-    text: "Save Configuration",
+    text: "Сохранить настройки",
     showProgress: false,
   });
 
@@ -68,7 +68,7 @@ const SettingsPage = () => {
         ...prev,
         isLoading: true,
         isDisabled: true,
-        text: "Saving Configuration...",
+        text: "Сохраняем настройки...",
       }));
       trackEvent(MixpanelEvent.Settings_SaveConfiguration_API_Call);
       await handleSaveLLMConfig(llmConfig);
@@ -83,22 +83,22 @@ const SettingsPage = () => {
           await handleModelDownload();
         }
       }
-      toast.info("Configuration saved successfully");
+      toast.info("Настройки успешно сохранены");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить настройки",
       }));
       trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/upload" });
       router.push("/upload");
     } catch (error) {
-      toast.info(error instanceof Error ? error.message : "Failed to save configuration");
+      toast.info(error instanceof Error ? error.message : "Не удалось сохранить настройки");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить настройки",
       }));
     }
   };
@@ -217,7 +217,7 @@ const SettingsPage = () => {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {downloadProgress}% Complete
+                    {downloadProgress}% выполнено
                   </p>
                 </div>
               )}
@@ -239,7 +239,7 @@ const SettingsPage = () => {
                     {downloadingModel.status === "downloading" &&
                       "Загрузка файлов модели..."}
                     {downloadingModel.status === "verifying" &&
-                      "Verifying model integrity..."}
+                      "Проверка целостности модели..."}
                     {downloadingModel.status === "pulling" &&
                       "Получение модели из реестра..."}
                   </div>
