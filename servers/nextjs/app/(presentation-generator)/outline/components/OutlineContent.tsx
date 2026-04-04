@@ -53,21 +53,10 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                 <div className="flex items-center justify-center">
                     <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 text-xs">
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        Thinking
+                        Думаю...
                     </span>
                 </div>
             )}
-            {/* <div className="flex items-center justify-between">
-                <h5 className="text-lg font-medium">
-                    Presentation Outline
-                </h5>
-                {isStreaming && (
-                    <div className="flex items-center text-sm text-blue-600">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                        Generating outlines...
-                    </div>
-                )}
-            </div> */}
             {/* Skeleton loading state */}
             {isLoading && (
                 <div className="space-y-4">
@@ -99,7 +88,6 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                         onDragEnd={onDragEnd}
                     >
                         {isStreaming ? (
-
                            outlines.map((item, index) => (
                             <OutlineItem
                                 key={`slide-${index}`}
@@ -137,7 +125,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                         disabled={isLoading || isStreaming}
                         className="w-full my-4 text-blue-600 border-blue-200"
                     >
-                        + Add Slide
+                        + Добавить слайд
                     </Button>
                 </div>
             )}
@@ -146,7 +134,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
             {!isStreaming && !isLoading && outlines && outlines.length === 0 && (
                 <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-200">
                     <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">No outlines available</p>
+                    <p className="text-gray-600 mb-4">Нет слайдов</p>
                     <Button
                         variant="outline"
                         onClick={() => {
@@ -155,7 +143,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                         }}
                         className="text-blue-600 border-blue-200"
                     >
-                        + Add First Slide
+                        + Добавить первый слайд
                     </Button>
                 </div>
             )}
@@ -163,4 +151,4 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
     );
 };
 
-export default OutlineContent; 
+export default OutlineContent;
