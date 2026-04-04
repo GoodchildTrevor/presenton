@@ -26,9 +26,9 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
     })
 
     const formatFileSize = (bytes: number): string => {
-        if (!bytes || bytes === 0) return '0 Bytes'
+        if (!bytes || bytes === 0) return '0 Байт'
         const k = 1024
-        const sizes = ['Bytes', 'KB', 'MB', 'GB']
+        const sizes = ['Байт', 'КБ', 'МБ', 'ГБ']
         const i = Math.floor(Math.log(bytes) / Math.log(k))
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
@@ -56,15 +56,15 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
 
         const invalidFiles = droppedFiles.filter(file => !validTypes.includes(file.type));
         if (invalidFiles.length > 0) {
-            toast.error('Invalid file type', {
-                description: 'Please upload only PDF, TXT, PPTX, or DOCX files',
+            toast.error('Неверный тип файла', {
+                description: 'Пожалуйста, загружайте только файлы PDF, TXT, PPTX или DOCX',
             });
             return;
         }
 
         if (hasPdf && droppedFiles.some(file => file.type === 'application/pdf')) {
-            toast.error('Multiple PDF files are not allowed', {
-                description: 'Please select only one PDF file',
+            toast.error('Нельзя загрузить несколько PDF', {
+                description: 'Пожалуйста, выберите только один PDF-файл',
             });
             return;
         }
@@ -77,8 +77,8 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
             const updatedFiles = [...files, ...validFiles]
             onFilesChange(updatedFiles)
 
-            toast.success('Files selected', {
-                description: `${validFiles.length} file(s) have been added`,
+            toast.success('Файлы добавлены', {
+                description: `Добавлено файлов: ${validFiles.length}`,
             })
         }
     }
@@ -96,8 +96,8 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
             const updatedFiles = [...files, ...validFiles]
             onFilesChange(updatedFiles)
 
-            toast.success('Files selected', {
-                description: `${validFiles.length} file(s) have been added`,
+            toast.success('Файлы добавлены', {
+                description: `Добавлено файлов: ${validFiles.length}`,
             })
         }
     }
@@ -139,7 +139,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                         }
                     </p>
                     <p className="text-gray-400 text-sm text-center mb-4">
-                        Работает PDF, TXT, PPTX, DOCX
+                        Поддерживается PDF, TXT, PPTX, DOCX
                     </p>
 
                     <input
@@ -162,7 +162,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                             hover:bg-purple-700 transition-colors duration-200
                             font-medium text-sm"
                     >
-                        Choose Files
+                        Выбрать файлы
                     </button>
                 </div>
 
@@ -171,7 +171,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                         <div className="p-4">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-medium text-gray-700">
-                                    Selected Files ({files.length})
+                                    Выбранные файлы ({files.length})
                                 </h3>
                             </div>
                             <div data-testid="file-list" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -199,7 +199,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                                                     text-gray-500 hover:text-red-500 
                                                     shadow-sm hover:shadow-md
                                                     transition-all duration-200"
-                                                        aria-label="Remove file"
+                                                        aria-label="Удалить файл"
                                                     >
                                                         <X className="w-4 h-4" />
                                                     </button>
@@ -207,7 +207,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
 
                                                 <div className="p-3 relative">
                                                     <p className="text-sm font-medium text-gray-700 truncate mb-1 pr-2">
-                                                        {file.name || 'Unnamed File'}
+                                                        {file.name || 'Без названия'}
                                                     </p>
                                                     <p className="text-xs text-gray-500">
                                                         {formatFileSize(file.size)}
