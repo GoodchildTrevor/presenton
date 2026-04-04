@@ -12,36 +12,21 @@ from utils.get_env import (
     get_user_config_path_env,
     get_image_provider_env,
     get_extended_reasoning_env,
-    get_web_grounding_env,
     get_flux_url_env,
 )
 from utils.parsers import parse_bool_or_none
 from utils.set_env import (
-    set_anthropic_api_key_env,
-    set_anthropic_model_env,
     set_comfyui_url_env,
     set_comfyui_workflow_env,
-    set_custom_llm_api_key_env,
-    set_custom_llm_url_env,
-    set_custom_model_env,
-    set_dall_e_3_quality_env,
     set_disable_image_generation_env,
     set_disable_thinking_env,
     set_extended_reasoning_env,
     set_flux_url_env,
-    set_google_api_key_env,
-    set_google_model_env,
-    set_gpt_image_1_5_quality_env,
     set_llm_provider_env,
     set_ollama_model_env,
     set_ollama_url_env,
-    set_openai_api_key_env,
-    set_openai_model_env,
-    set_pexels_api_key_env,
     set_image_provider_env,
-    set_pixabay_api_key_env,
     set_tool_calls_env,
-    set_web_grounding_env,
 )
 
 
@@ -83,11 +68,6 @@ def get_user_config():
             if existing_config.EXTENDED_REASONING is not None
             else (parse_bool_or_none(get_extended_reasoning_env()) or False)
         ),
-        WEB_GROUNDING=(
-            existing_config.WEB_GROUNDING
-            if existing_config.WEB_GROUNDING is not None
-            else (parse_bool_or_none(get_web_grounding_env()) or False)
-        ),
     )
 
 
@@ -99,12 +79,6 @@ def update_env_with_user_config():
         set_ollama_url_env(user_config.OLLAMA_URL)
     if user_config.OLLAMA_MODEL:
         set_ollama_model_env(user_config.OLLAMA_MODEL)
-    # if user_config.CUSTOM_LLM_URL:
-    #     set_custom_llm_url_env(user_config.CUSTOM_LLM_URL)
-    # if user_config.CUSTOM_LLM_API_KEY:
-    #     set_custom_llm_api_key_env(user_config.CUSTOM_LLM_API_KEY)
-    # if user_config.CUSTOM_MODEL:
-    #     set_custom_model_env(user_config.CUSTOM_MODEL)
     if user_config.DISABLE_IMAGE_GENERATION is not None:
         set_disable_image_generation_env(str(user_config.DISABLE_IMAGE_GENERATION))
     if user_config.IMAGE_PROVIDER:
@@ -117,5 +91,3 @@ def update_env_with_user_config():
         set_disable_thinking_env(str(user_config.DISABLE_THINKING))
     if user_config.EXTENDED_REASONING is not None:
         set_extended_reasoning_env(str(user_config.EXTENDED_REASONING))
-    if user_config.WEB_GROUNDING is not None:
-        set_web_grounding_env(str(user_config.WEB_GROUNDING))
