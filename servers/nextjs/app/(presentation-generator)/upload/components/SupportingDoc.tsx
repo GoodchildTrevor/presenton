@@ -56,8 +56,8 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
 
         const invalidFiles = droppedFiles.filter(file => !validTypes.includes(file.type));
         if (invalidFiles.length > 0) {
-            toast.error('Неверный тип файла', {
-                description: 'Пожалуйста, загружайте только PDF, TXT, PPTX или DOCX',
+            toast.error('Invalid file type', {
+                description: 'Please upload only PDF, TXT, PPTX, or DOCX files',
             });
             return;
         }
@@ -137,7 +137,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                         }
                     </p>
                     <p className="text-gray-400 text-sm text-center mb-4">
-                        Поддерживаются PDF, TXT, PPTX, DOCX
+                        Работает PDF, TXT, PPTX, DOCX
                     </p>
 
                     <input
@@ -191,22 +191,24 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                                                     text-gray-500 hover:text-red-500 
                                                     shadow-sm hover:shadow-md
                                                     transition-all duration-200"
-                                                aria-label="Удалить файл"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                                        aria-label="Remove file"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
 
-                                        <div className="p-3 relative">
-                                            <p className="text-sm font-medium text-gray-700 truncate mb-1 pr-2">
-                                                {file.name || 'Без названия'}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                {formatFileSize(file.size)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
+                                                <div className="p-3 relative">
+                                                    <p className="text-sm font-medium text-gray-700 truncate mb-1 pr-2">
+                                                        {file.name || 'Unnamed File'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {formatFileSize(file.size)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
