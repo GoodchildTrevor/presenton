@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
 
-// Вспомогательная функция для форматирования байтов в читаемую строку
+// Вспомогательная функция для форматирования байт в читаемую строку
 function formatBytes(bytes: number | null | undefined): string {
   if (bytes === null || bytes === undefined || bytes === 0) return 'Неизвестно';
   const sizes = ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ'];
@@ -64,19 +64,11 @@ export default function OllamaConfig({
       } else {
         console.error('Не удалось загрузить модели Ollama');
         setOllamaModels([]);
-<<<<<<< HEAD
-        toast.error('Не удалось загрузить модели Ollama');
-      }
-    } catch (error) {
-      console.error('Ошибка при загрузке моделей Ollama:', error);
-      toast.error('Ошибка при загрузке моделей Ollama');
-=======
         toast.error('Не удалось получить список моделей Ollama');
       }
     } catch (error) {
-      console.error('Error fetching Ollama models:', error);
+      console.error('Ошибка при загрузке моделей Ollama:', error);
       toast.error('Ошибка при получении моделей Ollama');
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
       setOllamaModels([]);
     } finally {
       setOllamaModelsLoading(false);
@@ -93,11 +85,7 @@ export default function OllamaConfig({
       <div>
         <div className="flex items-center justify-between mb-4 bg-green-50 p-2 rounded-sm">
           <label className="text-sm font-medium text-gray-700">
-<<<<<<< HEAD
-            Использовать кастомный URL Ollama
-=======
             Использовать свой URL Ollama
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
           </label>
           <Switch
             checked={useCustomUrl}
@@ -113,11 +101,7 @@ export default function OllamaConfig({
               <input
                 type="text"
                 required
-<<<<<<< HEAD
-                placeholder="Введите ваш URL Ollama"
-=======
                 placeholder="Введите URL Ollama"
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
                 className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 value={ollamaUrl}
                 onChange={(e) => onInputChange(e.target.value, "ollama_url")}
@@ -125,11 +109,7 @@ export default function OllamaConfig({
             </div>
             <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
               <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-<<<<<<< HEAD
-              Измените это, если вы используете собственный экземпляр Ollama
-=======
               Измените, если используете свой экземпляр Ollama
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
             </p>
           </div>
         )}
@@ -241,11 +221,7 @@ export default function OllamaConfig({
         </div>
         {(!ollamaModels || ollamaModels.length === 0) && !ollamaModelsLoading && (
           <p className="mt-2 text-sm text-gray-500">
-<<<<<<< HEAD
-            Нет доступных моделей. Пожалуйста, проверьте подключение к Ollama.
-=======
             Модели недоступны. Проверьте подключение к Ollama.
->>>>>>> 6d6c9841b9a778d3f3dd6db5896b2e2b92061975
           </p>
         )}
       </div>
