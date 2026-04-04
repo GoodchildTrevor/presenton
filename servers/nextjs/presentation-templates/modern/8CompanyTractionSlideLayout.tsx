@@ -12,9 +12,9 @@ import {
 import * as z from "zod";
 
 export const layoutId = "company-traction-slide";
-export const layoutName = "Company Traction Slide";
+export const layoutName = "Слайд трекшена компании";
 export const layoutDescription =
-  "A slide layout designed to present company traction data, including growth statistics over the years, a chart visualization, and key metrics in a visually appealing format.";
+  "Макет слайда для представления данных о трекшене компании, включая статистику роста по годам, визуализацию в виде графика и ключевые показатели.";
 
 const growthStatsSchema = z
   .object({
@@ -23,32 +23,29 @@ const growthStatsSchema = z
   .catchall(z.number())
   .meta({
     description:
-      "Growth statistics for a specific year, with any number of metrics as key-value pairs where keys are metric names and values are numbers.",
+      "Статистика роста за конкретный год. Ключи — названия метрик, значения — числа.",
   });
 
-// growthStats: list of dicts, each dict is { year: string, <metric1>: number, <metric2>: number, ... }
 const tractionSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
-    description: "Company name displayed in header",
+  companyName: z.string().min(2).max(50).default("Название компании").meta({
+    description: "Название компании в шапке",
   }),
-  date: z.string().min(5).max(50).default("June 13, 2038").meta({
-    description: "Today Date displayed in header",
+  date: z.string().min(5).max(50).default("13 июня 2038 г.").meta({
+    description: "Текущая дата в шапке",
   }),
-  title: z.string().default("Company Traction").meta({
-    description: "Main title of the slide",
+  title: z.string().default("Трекшен компании").meta({
+    description: "Основной заголовок слайда",
   }),
   description: z
     .string()
     .min(3)
     .max(200)
     .default(
-      "Traction is a period where the company is feeling momentum during its development period. If traction momentum is not harnessed, sales figures can decline and the customer base can shrink. In general, companies will judge success by the amount of revenue and new customers they receive.",
+      "Трекшен — это период, когда компания ощущает импульс развития. Если этот импульс не использовать, продажи могут снизиться, а клиентская база — сократиться. Как правило, успех оценивается по объему выручки и количеству новых клиентов.",
     )
     .meta({
-      description:
-        "Main content text describing the company's traction and growth momentum.",
+      description: "Основной текст, описывающий трекшен и динамику роста.",
     }),
-  // growthStats is a list of objects, each with a 'year' and any number of metric keys (all numbers)
   growthStats: z
     .array(growthStatsSchema)
     .min(1)
@@ -56,56 +53,49 @@ const tractionSchema = z.object({
     .default([
       growthStatsSchema.parse({
         year: "2020",
-        artificialIntelligence: 5,
-        internetOfThings: 10,
-        others: 8,
+        искусственныйИнтеллект: 5,
+        интернетВещей: 10,
+        прочее: 8,
       }),
       growthStatsSchema.parse({
         year: "2021",
-        artificialIntelligence: 10,
-        internetOfThings: 20,
-        others: 15,
+        искусственныйИнтеллект: 10,
+        интернетВещей: 20,
+        прочее: 15,
       }),
       growthStatsSchema.parse({
         year: "2022",
-        artificialIntelligence: 20,
-        internetOfThings: 30,
-        others: 22,
+        искусственныйИнтеллект: 20,
+        интернетВещей: 30,
+        прочее: 22,
       }),
       growthStatsSchema.parse({
         year: "2023",
-        artificialIntelligence: 28,
-        internetOfThings: 38,
-        others: 29,
+        искусственныйИнтеллект: 28,
+        интернетВещей: 38,
+        прочее: 29,
       }),
       growthStatsSchema.parse({
         year: "2024",
-        artificialIntelligence: 35,
-        internetOfThings: 45,
-        others: 34,
+        искусственныйИнтеллект: 35,
+        интернетВещей: 45,
+        прочее: 34,
       }),
       growthStatsSchema.parse({
         year: "2025",
-        artificialIntelligence: 45,
-        internetOfThings: 53,
-        others: 42,
+        искусственныйИнтеллект: 45,
+        интернетВещей: 53,
+        прочее: 42,
       }),
       growthStatsSchema.parse({
         year: "2026",
-        artificialIntelligence: 55,
-        internetOfThings: 65,
-        others: 52,
-      }),
-      growthStatsSchema.parse({
-        year: "2029",
-        artificialIntelligence: 55,
-        internetOfThings: 65,
-        others: 52,
+        искусственныйИнтеллект: 55,
+        интернетВещей: 65,
+        прочее: 52,
       }),
     ])
     .meta({
-      description:
-        "Growth statistics for the company, used for chart visualization. Each entry is an object representing a specific year, with the 'year' key as a string (e.g., '2020'), and additional keys for each metric (such as 'artificialIntelligence', 'internetOfThings', 'others'), where the values are numbers representing the metric's value for that year. Example:\n\n[\n  { year: '2020', artificialIntelligence: 5, internetOfThings: 10, others: 8 },\n  { year: '2021', artificialIntelligence: 10, internetOfThings: 20, others: 15 },\n  ...\n]\nThis structure allows the chart to dynamically render multiple series over time, with each metric visualized as a separate line.",
+      description: "Данные роста для графика. Каждый объект содержит год и числовые метрики.",
     }),
 });
 
@@ -116,7 +106,6 @@ interface Props {
   data?: Partial<CompanyTractionData>;
 }
 
-// Helper: assign colors to series
 const defaultColors = [
   "#1E4CD9",
   "#3b82f6",
@@ -134,14 +123,19 @@ function getSeriesKeys(
   growthStats: Array<Record<string, string | number>>,
 ): string[] {
   if (!growthStats.length) return [];
-  // Exclude 'year' or any non-numeric keys
   const first = growthStats[0];
   return Object.keys(first).filter(
     (key) => key !== "year" && typeof first[key] === "number",
   );
 }
 
-// Compute stats for right column, generic for all series
+// Форматирование ключей для отображения (CamelCase -> Слова с пробелами)
+const formatLabel = (key: string) => 
+  key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim();
+
 function computeStats(
   growthStats: Array<Record<string, string | number>>,
   seriesKeys: string[],
@@ -149,29 +143,25 @@ function computeStats(
   if (!growthStats.length) return [];
   const first = growthStats[0];
   const last = growthStats[growthStats.length - 1];
-  return seriesKeys.map((key) => {
+  
+  // Берем максимум 3 метрики для правой колонки, чтобы не перегружать интерфейс
+  return seriesKeys.slice(0, 3).map((key) => {
     const start = typeof first[key] === "number" ? (first[key] as number) : 0;
     const end = typeof last[key] === "number" ? (last[key] as number) : 0;
     const growth = start === 0 ? 0 : ((end - start) / Math.abs(start)) * 100;
+    const label = formatLabel(key);
+    
     return {
-      label: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      value: `${growth >= 0 ? "+" : ""}${Math.round(growth)}% growth`,
-      description: `${key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase())} growth over the period.`,
+      label: label,
+      value: `${growth >= 0 ? "+" : ""}${Math.round(growth)}%`,
+      description: `Рост показателя "${label}" за период.`,
     };
   });
 }
 
 const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
   const growthStats = data?.growthStats || [];
-
-  // Dynamically determine series keys
   const seriesKeys = getSeriesKeys(growthStats);
-
-  // Prepare stats for the right column, generic for all series
   const stats = computeStats(growthStats, seriesKeys);
 
   return (
@@ -182,9 +172,7 @@ const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
       />
       <div
         className="w-full max-w-[1280px] max-h-[720px] aspect-video bg-white mx-auto rounded shadow-lg overflow-hidden relative z-20"
-        style={{
-          fontFamily: "Montserrat, sans-serif",
-        }}
+        style={{ fontFamily: "Montserrat, sans-serif" }}
       >
         {/* Header */}
         <div className="absolute top-8 left-10 right-10 flex justify-between items-center text-[#1E4CD9] text-sm font-semibold">
@@ -194,7 +182,7 @@ const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
 
         {/* Main Content */}
         <div className="px-16 py-16 flex h-full gap-8">
-          {/* Left Column - Chart with Title Below */}
+          {/* Left Column */}
           <div className="flex-1 pr-12 flex flex-col justify-center">
             <h1 className="text-6xl font-bold text-blue-600 mb-4 leading-tight text-left">
               {data?.title}
@@ -233,9 +221,7 @@ const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
                         dataKey={key}
                         stroke={defaultColors[idx % defaultColors.length]}
                         strokeWidth={3}
-                        name={key
-                          .replace(/([A-Z])/g, " $1")
-                          .replace(/^./, (str) => str.toUpperCase())}
+                        name={formatLabel(key)}
                         dot={{
                           r: 4,
                           fill: defaultColors[idx % defaultColors.length],
@@ -252,11 +238,10 @@ const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
             </div>
           </div>
 
-          {/* Right Column - Description and Stats */}
+          {/* Right Column */}
           <div className="flex flex-col items-start justify-center w-[52%] gap-8">
             <p className="text-blue-600 text-base leading-relaxed font-normal mb-6 max-w-xl text-left">
-              {data?.description ||
-                "Traction is a period where the company is feeling momentum during its development period. If traction momentum is not harnessed, sales figures can decline and the customer base can shrink. In general, companies will judge success by the amount of revenue and new customers they receive."}
+              {data?.description}
             </p>
             <div className="flex flex-row w-full gap-6">
               {stats.map((stat, index) => (
@@ -264,13 +249,13 @@ const CompanyTractionSlideLayout: React.FC<Props> = ({ data }) => {
                   key={index}
                   className="flex-1 bg-[#f5f8ff] rounded-lg shadow-sm px-5 py-4 flex flex-col items-start"
                 >
-                  <div className="bg-[#1E4CD9] text-white text-xs font-semibold px-3 py-1 rounded-sm mb-2">
+                  <div className="bg-[#1E4CD9] text-white text-[10px] font-semibold px-2 py-1 rounded-sm mb-2 uppercase tracking-wider">
                     {stat.label}
                   </div>
                   <div className="text-2xl font-bold text-[#1E4CD9] mb-1">
                     {stat.value}
                   </div>
-                  <p className="text-sm text-gray-700 leading-snug">
+                  <p className="text-xs text-gray-700 leading-snug">
                     {stat.description}
                   </p>
                 </div>

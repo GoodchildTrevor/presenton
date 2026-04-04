@@ -15,7 +15,7 @@ import { LLMConfig } from "@/types/llm_config";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
 import { usePathname } from "next/navigation";
 
-// Button state interface
+// Интерфейс состояния кнопки
 interface ButtonState {
   isLoading: boolean;
   isDisabled: boolean;
@@ -42,7 +42,7 @@ export default function Home() {
   const [buttonState, setButtonState] = useState<ButtonState>({
     isLoading: false,
     isDisabled: false,
-    text: "Save Configuration",
+    text: "Сохранить конфигурацию",
     showProgress: false
   });
 
@@ -60,41 +60,38 @@ export default function Home() {
         ...prev,
         isLoading: true,
         isDisabled: true,
-        text: "Saving Configuration..."
+        text: "Сохранение конфигурации..."
       }));
-      // API: save config
+      
       trackEvent(MixpanelEvent.Home_SaveConfiguration_API_Call);
-      // API CALL: save config
       await handleSaveLLMConfig(llmConfig);
 
       if (llmConfig.LLM === "ollama" && llmConfig.OLLAMA_MODEL) {
-        // API: check model pulled
         trackEvent(MixpanelEvent.Home_CheckOllamaModelPulled_API_Call);
         const isPulled = await checkIfSelectedOllamaModelIsPulled(llmConfig.OLLAMA_MODEL);
         if (!isPulled) {
           setShowDownloadModal(true);
-          // API: download model
           trackEvent(MixpanelEvent.Home_DownloadOllamaModel_API_Call);
           await handleModelDownload();
         }
       }
-      toast.info("Configuration saved successfully");
+      toast.info("Конфигурация успешно сохранена");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration"
+        text: "Сохранить конфигурацию"
       }));
-      // Track navigation from -> to
+      
       trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/" });
       router.push("/");
     } catch (error) {
-      toast.info(error instanceof Error ? error.message : "Failed to save configuration");
+      toast.info(error instanceof Error ? error.message : "Не удалось сохранить конфигурацию");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration"
+        text: "Сохранить конфигурацию"
       }));
     }
   };
@@ -109,14 +106,13 @@ export default function Home() {
     }
   };
 
-
   useEffect(() => {
     if (downloadingModel && downloadingModel.downloaded !== null && downloadingModel.size !== null) {
       const percentage = Math.round(((downloadingModel.downloaded / downloadingModel.size) * 100));
       setButtonState({
         isLoading: true,
         isDisabled: true,
-        text: `Downloading Model (${percentage}%)`,
+        text: `Загрузка модели (${percentage}%)`,
         showProgress: true,
         progressPercentage: percentage,
         status: downloadingModel.status
@@ -127,7 +123,7 @@ export default function Home() {
       setTimeout(() => {
         setShowDownloadModal(false);
         setDownloadingModel(null);
-        toast.info("Model downloaded successfully!");
+        toast.info("Модель успешно загружена!");
       }, 2000);
     }
   }, [downloadingModel]);
@@ -135,17 +131,17 @@ export default function Home() {
   return (
     <div className="h-screen bg-gradient-to-b font-instrument_sans from-gray-50 to-white flex flex-col overflow-hidden">
       <main className="flex-1 container mx-auto px-4 max-w-3xl overflow-hidden flex flex-col">
-        {/* Branding Header */}
+        {/* Брендированный заголовок */}
         <div className="text-center mb-2 mt-4 flex-shrink-0">
           <div className="flex items-center justify-center gap-3 mb-2">
             <img src="/Logo.png" alt="Presenton Logo" className="h-12" />
           </div>
           <p className="text-gray-600 text-sm">
-            Open-source AI presentation generator
+            Генератор презентаций на базе ИИ с открытым исходным кодом
           </p>
         </div>
 
-        {/* Main Configuration Card */}
+        {/* Основная карточка конфигурации */}
         <div className="flex-1 overflow-hidden">
           <LLMProviderSelection
             initialLLMConfig={llmConfig}
@@ -156,13 +152,12 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Download Progress Modal */}
+      {/* Модальное окно прогресса загрузки */}
       {showDownloadModal && downloadingModel && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-2xl max-w-md w-full p-6 relative">
-            {/* Modal Content */}
             <div className="text-center">
-              {/* Icon */}
+              {/* Иконка */}
               <div className="mb-4">
                 {downloadingModel.done ? (
                   <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
@@ -171,17 +166,17 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Title */}
+              {/* Заголовок */}
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {downloadingModel.done ? "Download Complete!" : "Downloading Model"}
+                {downloadingModel.done ? "Загрузка завершена!" : "Загрузка модели"}
               </h3>
 
-              {/* Model Name */}
+              {/* Название модели */}
               <p className="text-sm text-gray-600 mb-6">
                 {llmConfig.OLLAMA_MODEL}
               </p>
 
-              {/* Progress Bar */}
+              {/* Прогресс-бар */}
               {downloadProgress > 0 && (
                 <div className="mb-4">
                   <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
@@ -191,12 +186,12 @@ export default function Home() {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {downloadProgress}% Complete
+                    Завершено: {downloadProgress}%
                   </p>
                 </div>
               )}
 
-              {/* Status */}
+              {/* Статус */}
               {downloadingModel.status && (
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <CheckCircle className="w-4 h-4 text-green-600" />
@@ -206,21 +201,21 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Status Message */}
+              {/* Сообщения статуса */}
               {downloadingModel.status && downloadingModel.status !== "pulled" && (
                 <div className="text-xs text-gray-500">
-                  {downloadingModel.status === "downloading" && "Downloading model files..."}
-                  {downloadingModel.status === "verifying" && "Verifying model integrity..."}
-                  {downloadingModel.status === "pulling" && "Pulling model from registry..."}
+                  {downloadingModel.status === "downloading" && "Загрузка файлов модели..."}
+                  {downloadingModel.status === "verifying" && "Проверка целостности..."}
+                  {downloadingModel.status === "pulling" && "Получение модели из реестра..."}
                 </div>
               )}
 
-              {/* Download Info */}
+              {/* Инфо о загрузке */}
               {downloadingModel.downloaded && downloadingModel.size && (
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>Downloaded: {(downloadingModel.downloaded / 1024 / 1024).toFixed(1)} MB</span>
-                    <span>Total: {(downloadingModel.size / 1024 / 1024).toFixed(1)} MB</span>
+                    <span>Загружено: {(downloadingModel.downloaded / 1024 / 1024).toFixed(1)} МБ</span>
+                    <span>Всего: {(downloadingModel.size / 1024 / 1024).toFixed(1)} МБ</span>
                   </div>
                 </div>
               )}
@@ -229,7 +224,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Fixed Bottom Button */}
+      {/* Фиксированная нижняя кнопка */}
       <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
         <div className="container mx-auto max-w-3xl">
           <button

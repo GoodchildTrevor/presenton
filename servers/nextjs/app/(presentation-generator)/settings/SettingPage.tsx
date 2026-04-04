@@ -15,7 +15,7 @@ import Header from "../dashboard/components/Header";
 import { LLMConfig } from "@/types/llm_config";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
 
-// Button state interface
+// Интерфейс состояния кнопки
 interface ButtonState {
   isLoading: boolean;
   isDisabled: boolean;
@@ -35,7 +35,7 @@ const SettingsPage = () => {
   const [buttonState, setButtonState] = useState<ButtonState>({
     isLoading: false,
     isDisabled: false,
-    text: "Save Configuration",
+    text: "Сохранить конфигурацию",
     showProgress: false,
   });
 
@@ -68,7 +68,7 @@ const SettingsPage = () => {
         ...prev,
         isLoading: true,
         isDisabled: true,
-        text: "Saving Configuration...",
+        text: "Сохранение...",
       }));
       trackEvent(MixpanelEvent.Settings_SaveConfiguration_API_Call);
       await handleSaveLLMConfig(llmConfig);
@@ -83,22 +83,22 @@ const SettingsPage = () => {
           await handleModelDownload();
         }
       }
-      toast.info("Configuration saved successfully");
+      toast.info("Конфигурация успешно сохранена");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить конфигурацию",
       }));
       trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/upload" });
       router.push("/upload");
     } catch (error) {
-      toast.info(error instanceof Error ? error.message : "Failed to save configuration");
+      toast.info(error instanceof Error ? error.message : "Не удалось сохранить конфигурацию");
       setButtonState(prev => ({
         ...prev,
         isLoading: false,
         isDisabled: false,
-        text: "Save Configuration",
+        text: "Сохранить конфигурацию",
       }));
     }
   };
@@ -125,7 +125,7 @@ const SettingsPage = () => {
       setButtonState({
         isLoading: true,
         isDisabled: true,
-        text: `Downloading Model (${percentage}%)`,
+        text: `Загрузка модели (${percentage}%)`,
         showProgress: true,
         progressPercentage: percentage,
         status: downloadingModel.status,
@@ -136,7 +136,7 @@ const SettingsPage = () => {
       setTimeout(() => {
         setShowDownloadModal(false);
         setDownloadingModel(null);
-        toast.info("Model downloaded successfully!");
+        toast.info("Модель успешно загружена!");
       }, 2000);
     }
   }, [downloadingModel]);
@@ -145,7 +145,7 @@ const SettingsPage = () => {
     <div className="h-screen bg-gradient-to-b font-instrument_sans from-gray-50 to-white flex flex-col overflow-hidden">
       <Header />
       <main className="flex-1 container mx-auto px-4 max-w-3xl overflow-hidden flex flex-col">
-        {/* LLM Selection Component */}
+        {/* Компонент выбора LLM */}
         <div className="flex-1 overflow-hidden">
           <LLMProviderSelection
             initialLLMConfig={llmConfig}
@@ -156,7 +156,7 @@ const SettingsPage = () => {
         </div>
       </main>
 
-      {/* Fixed Bottom Button */}
+      {/* Фиксированная нижняя кнопка */}
       <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
         <div className="container mx-auto max-w-3xl">
           <button
@@ -180,13 +180,13 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Download Progress Modal */}
+      {/* Модальное окно прогресса загрузки */}
       {showDownloadModal && downloadingModel && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-2xl max-w-md w-full p-6 relative">
-            {/* Modal Content */}
+            {/* Содержимое модального окна */}
             <div className="text-center">
-              {/* Icon */}
+              {/* Иконка */}
               <div className="mb-4">
                 {downloadingModel.done ? (
                   <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
@@ -195,19 +195,19 @@ const SettingsPage = () => {
                 )}
               </div>
 
-              {/* Title */}
+              {/* Заголовок */}
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {downloadingModel.done
-                  ? "Download Complete!"
-                  : "Downloading Model"}
+                  ? "Загрузка завершена!"
+                  : "Загрузка модели"}
               </h3>
 
-              {/* Model Name */}
+              {/* Название модели */}
               <p className="text-sm text-gray-600 mb-6">
                 {llmConfig.OLLAMA_MODEL}
               </p>
 
-              {/* Progress Bar */}
+              {/* Прогресс-бар */}
               {downloadProgress > 0 && (
                 <div className="mb-4">
                   <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
@@ -217,46 +217,46 @@ const SettingsPage = () => {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {downloadProgress}% Complete
+                    Загружено: {downloadProgress}%
                   </p>
                 </div>
               )}
 
-              {/* Status */}
+              {/* Статус */}
               {downloadingModel.status && (
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <CheckCircle className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-medium text-green-700 capitalize">
-                    {downloadingModel.status}
+                    {downloadingModel.status === "pulled" ? "Загружено" : downloadingModel.status}
                   </span>
                 </div>
               )}
 
-              {/* Status Message */}
+              {/* Сообщения статуса */}
               {downloadingModel.status &&
                 downloadingModel.status !== "pulled" && (
                   <div className="text-xs text-gray-500">
                     {downloadingModel.status === "downloading" &&
-                      "Downloading model files..."}
+                      "Загрузка файлов модели..."}
                     {downloadingModel.status === "verifying" &&
-                      "Verifying model integrity..."}
+                      "Проверка целостности..."}
                     {downloadingModel.status === "pulling" &&
-                      "Pulling model from registry..."}
+                      "Получение модели из реестра..."}
                   </div>
                 )}
 
-              {/* Download Info */}
+              {/* Информация о загрузке */}
               {downloadingModel.downloaded && downloadingModel.size && (
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                   <div className="flex justify-between text-xs text-gray-600">
                     <span>
-                      Downloaded:{" "}
+                      Загружено:{" "}
                       {(downloadingModel.downloaded / 1024 / 1024).toFixed(1)}{" "}
-                      MB
+                      МБ
                     </span>
                     <span>
-                      Total: {(downloadingModel.size / 1024 / 1024).toFixed(1)}{" "}
-                      MB
+                      Всего: {(downloadingModel.size / 1024 / 1024).toFixed(1)}{" "}
+                      МБ
                     </span>
                   </div>
                 </div>

@@ -49,13 +49,21 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
       
       dispatch(setLLMConfig(llmConfig));
       const isValid = hasValidLLMConfig(llmConfig);
+      
+      // Allow navigation to settings page regardless of model status
+      // so users can configure/download their model
+      if (route === '/settings') {
+        setIsLoading(false);
+        return;
+      }
+      
       if (isValid) {
         // Check if the selected Ollama model is pulled
         if (llmConfig.LLM === 'ollama') {
           const isPulled = await checkIfSelectedOllamaModelIsPulled(llmConfig.OLLAMA_MODEL);
           if (!isPulled) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
+            router.push('/settings');
+            setLoadingToFalseAfterNavigatingTo('/settings');
             return;
           }
         }

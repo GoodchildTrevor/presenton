@@ -7,62 +7,56 @@ import { ImageSchema } from "@/presentation-templates/defaultSchemes";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
 
 export const layoutId = "market-validation-slide";
-export const layoutName = "Market Validation Slide";
+export const layoutName = "Слайд валидации рынка";
 export const layoutDescription =
-  "A slide layout designed to present market validation data, including flexible market validation metrics, comparisons, and an optional decorative image.";
+  "Макет слайда, предназначенный для представления данных о валидации рынка, включая гибкие метрики, сравнения и декоративное изображение.";
 
-// Make the schema generic: allow any label/value pairs for comparison
 const marketValidationSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
-    description: "Company name displayed in header",
+  companyName: z.string().min(2).max(50).default("Название компании").meta({
+    description: "Название компании, отображаемое в шапке",
   }),
-  date: z.string().min(5).max(50).default("June 13, 2038").meta({
-    description: "Today Date displayed in header",
+  date: z.string().min(5).max(50).default("13 июня 2038 г.").meta({
+    description: "Дата, отображаемая в шапке",
   }),
-  title: z.string().min(3).max(20).default("Market Validation").meta({
-    description: "Title of the slide",
+  title: z.string().min(3).max(20).default("Валидация рынка").meta({
+    description: "Заголовок слайда",
   }),
   description: z
     .string()
     .min(50)
     .max(400)
     .default(
-      "It’s a market testing stage to ensure that the products produced by the company can be accepted and effectively used by the broad market. For start-up companies, we can use data already achieved by similar products from other companies.",
+      "Это этап тестирования рынка, предназначенный для подтверждения того, что продукты компании востребованы и могут эффективно использоваться широким кругом потребителей. Для стартапов мы можем использовать данные, полученные аналогичными продуктами других компаний.",
     )
     .meta({
-      description:
-        "Main description text for the slide explaining market validation",
+      description: "Основное описание слайда, объясняющее суть валидации рынка",
     }),
-  // Generic comparisonData: label for row, label for metric, and value
   comparisonData: z
     .array(
       z.object({
         label: z.string().min(2).max(50).meta({
-          description:
-            "Name of comparison entity (e.g., company, product, etc.)",
+          description: "Название сравниваемого объекта (компания, продукт и т.д.)",
         }),
         metricLabel: z.string().min(2).max(50).meta({
-          description:
-            "Label for the metric being compared (e.g., Users, Revenue, etc.)",
+          description: "Название метрики (например, Пользователи, Доход и т.д.)",
         }),
         value: z.number().min(0).meta({
-          description: "Numeric value for the metric",
+          description: "Числовое значение метрики",
         }),
       }),
     )
     .min(2)
     .max(5)
     .default([
-      { label: "Thynk Unlimited", metricLabel: "Revenue ($K)", value: 2650 },
-      { label: "Salford & Co.", metricLabel: "Revenue ($K)", value: 1850 },
-      { label: "Liceria & Co.", metricLabel: "Revenue ($K)", value: 1010 },
+      { label: "ООО 'Вектор'", metricLabel: "Выручка (тыс. $)", value: 2650 },
+      { label: "Солфорд и Ко", metricLabel: "Выручка (тыс. $)", value: 1850 },
+      { label: "Лицерия Групп", metricLabel: "Выручка (тыс. $)", value: 1010 },
     ])
     .meta({
-      description:
-        "Comparison data for market validation, allowing flexible labels and values",
+      description: "Данные для сравнения, позволяющие использовать гибкие метрики и подписи",
     }),
   image: ImageSchema.optional().meta({
-    description: "Optional decorative image",
+    description: "Необязательное декоративное изображение",
   }),
 });
 
@@ -79,12 +73,12 @@ const MarketValidationSlideLayout: React.FC<
 > = ({ data: slideData }) => {
   const comparisonData = slideData?.comparisonData || [];
 
-  // Chart color palette (shadcn blue and gray)
+  // Палитра цветов для диаграммы (оттенки синего)
   const chartColors = ["#2563eb", "#1e40af", "#60a5fa", "#93c5fd", "#dbeafe"];
 
-  // Determine the metric label to use (assume all rows use the same metricLabel)
+  // Определяем название метрики (берем из первой строки данных)
   const metricLabel =
-    comparisonData.length > 0 ? comparisonData[0].metricLabel : "Metric";
+    comparisonData.length > 0 ? comparisonData[0].metricLabel : "Показатель";
 
   return (
     <>
@@ -99,15 +93,15 @@ const MarketValidationSlideLayout: React.FC<
           fontFamily: "Montserrat, sans-serif",
         }}
       >
-        {/* Header */}
+        {/* Шапка */}
         <div className="absolute top-8 left-10 right-10 flex justify-between items-center text-[#1E4CD9] text-sm font-semibold">
           <span>{slideData?.companyName}</span>
           <span>{slideData?.date}</span>
         </div>
 
-        {/* Main Content */}
+        {/* Основной контент */}
         <div className="px-16 py-16 flex h-full gap-8">
-          {/* Left Column */}
+          {/* Левая колонка */}
           <div className="flex-1 pr-12 flex flex-col justify-center">
             <h1 className="text-6xl font-bold text-blue-600 mb-8 leading-tight text-left">
               {slideData?.title}
@@ -117,9 +111,9 @@ const MarketValidationSlideLayout: React.FC<
             </p>
           </div>
 
-          {/* Right Column - Chart on top, Table on bottom */}
+          {/* Правая колонка — График сверху, Таблица снизу */}
           <div className="flex-1 flex flex-col justify-center items-center gap-6">
-            {/* Bar Chart */}
+            {/* Гистограмма */}
             <Card className="w-full p-4 flex flex-col items-center">
               <div className="w-full h-64">
                 <ChartContainer
@@ -137,10 +131,9 @@ const MarketValidationSlideLayout: React.FC<
                       dataKey="label"
                       type="category"
                       width={120}
-                      tick={{ fill: "#1e40af", fontWeight: 600 }}
+                      tick={{ fill: "#1e40af", fontWeight: 600, fontSize: 12 }}
                     />
                     <Tooltip />
-                    {/* Legend removed */}
                     <Bar
                       dataKey="value"
                       name={metricLabel}
@@ -157,24 +150,25 @@ const MarketValidationSlideLayout: React.FC<
                 </ChartContainer>
               </div>
             </Card>
-            {/* Table of comparison data */}
-            <Card className="w-full">
+
+            {/* Таблица данных */}
+            <Card className="w-full overflow-hidden">
               <Table>
                 <TableHeader>
-                  <tr>
-                    <th className="text-left px-4 py-2 text-blue-700">
-                      {comparisonData.length > 0 ? "Name" : "Name"}
+                  <tr className="bg-slate-50">
+                    <th className="text-left px-4 py-2 text-blue-700 font-bold">
+                      Наименование
                     </th>
-                    <th className="text-left px-4 py-2 text-blue-700">
+                    <th className="text-left px-4 py-2 text-blue-700 font-bold">
                       {metricLabel}
                     </th>
                   </tr>
                 </TableHeader>
                 <TableBody>
                   {comparisonData.map((entry) => (
-                    <tr key={entry.label}>
-                      <td className="px-4 py-2">{entry.label}</td>
-                      <td className="px-4 py-2">
+                    <tr key={entry.label} className="border-t">
+                      <td className="px-4 py-2 text-sm text-slate-700">{entry.label}</td>
+                      <td className="px-4 py-2 text-sm font-semibold text-slate-900">
                         {entry.value.toLocaleString()}
                       </td>
                     </tr>

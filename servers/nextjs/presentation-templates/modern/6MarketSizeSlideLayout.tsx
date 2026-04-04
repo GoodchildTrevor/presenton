@@ -3,23 +3,23 @@ import * as z from "zod";
 import { ImageSchema } from "@/presentation-templates/defaultSchemes";
 
 export const layoutId = "market-size-pitchdeck-slide";
-export const layoutName = "Market Size Pitch Deck Slide";
+export const layoutName = "Слайд размера рынка";
 export const layoutDescription =
-  "A professional slide layout designed to present market size statistics, including TAM, SAM, and SOM, with a world map and key metrics.";
+  "Профессиональный макет слайда для презентации статистики объема рынка, включая TAM, SAM и SOM, с картой мира и ключевыми показателями.";
 
 const marketSizeSlideSchema = z.object({
-  title: z.string().min(3).max(15).default("Market Size").meta({
-    description: "Main slide title",
+  title: z.string().min(3).max(15).default("Объем рынка").meta({
+    description: "Основной заголовок слайда",
   }),
-  companyName: z.string().min(2).max(50).default("presenton").meta({
-    description: "Company name displayed in header",
+  companyName: z.string().min(2).max(50).default("Название компании").meta({
+    description: "Название компании, отображаемое в шапке",
   }),
-  date: z.string().min(5).max(50).default("June 13, 2038").meta({
-    description: "Today Date displayed in header",
+  date: z.string().min(5).max(50).default("13 июня 2038 г.").meta({
+    description: "Дата, отображаемая в шапке",
   }),
   mapImage: ImageSchema.default({
     __image_url__:
-      "https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg", // You can quickly find a world map image via a Google search or use a free resource like Wikimedia Commons
+      "https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg",
     __image_prompt__: "World map with location pins or points",
   }),
   marketStats: z
@@ -34,35 +34,35 @@ const marketSizeSlideSchema = z.object({
     .max(3)
     .default([
       {
-        label: "Total Available Market (TAM)",
-        value: "1.4 Billion",
+        label: "Весь объем рынка (TAM)",
+        value: "1.4 Миллиарда",
         description:
-          "In the TAM Section, we can fill in the potential of any person who can buy an offer or the maximum amount of revenue a business can earn by selling their offer.",
+          "Общий объем целевого рынка — это максимально возможная выручка, которую компания может получить, если захватит 100% рынка.",
       },
       {
-        label: "Serviceable Available Market (SAM)",
-        value: "194 Million",
+        label: "Доступный объем рынка (SAM)",
+        value: "194 Миллиона",
         description:
-          "It is a part of TAM that has the potential to become a target market for the company by considering the type of product, technology available and geographical conditions.",
+          "Доля TAM, на которую компания может претендовать с учетом географии, технологий и специфики продукта.",
       },
       {
-        label: "Serviceable Obtainable Market (SOM)",
-        value: "167 Million",
+        label: "Реально достижимый рынок (SOM)",
+        value: "167 Миллиона",
         description:
-          "The SOM is a smaller fraction of the SAM that is the target of a serviceable and realistically achievable market in the short to medium term.",
+          "Доля SAM, которую компания планирует и способна реально занять в краткосрочной и среднесрочной перспективе.",
       },
     ])
     .meta({
       description:
-        "Market statistics including TAM, SAM, and SOM with labels, values, and descriptions.",
+        "Статистика рынка, включая TAM, SAM и SOM с названиями, значениями и описаниями.",
     }),
   description: z
     .string()
     .default(
-      "Market size is the total amount of all sales and customers that can be seen directly by stakeholders. This technique is usually calculated at the end of the year, the market size can be used by companies to determine the potential of their market and business in the future. This is very useful, especially for new companies that will offer services to those who are interested in our services.",
+      "Объем рынка — это совокупный показатель всех продаж и потенциальных клиентов. Данные показатели помогают компаниям оценить потенциал бизнеса в будущем. Это критически важно для новых компаний при оценке востребованности их услуг инвесторами и стейкхолдерами.",
     )
     .meta({
-      description: "Main description text for the slide",
+      description: "Основной текст описания для слайда",
     }),
 });
 
@@ -80,7 +80,6 @@ const MarketSizeSlideLayout: React.FC<MarketSizeSlideProps> = ({
 
   return (
     <>
-      {/* Montserrat Font */}
       <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
         rel="stylesheet"
@@ -92,29 +91,28 @@ const MarketSizeSlideLayout: React.FC<MarketSizeSlideProps> = ({
           fontFamily: "Montserrat, sans-serif",
         }}
       >
-        {/* Header */}
+        {/* Шапка */}
         <div className="absolute top-8 left-10 right-10 flex justify-between items-center text-[#1E4CD9] text-sm font-semibold">
           <span>{slideData?.companyName || "Rimberio"}</span>
-          <span>{slideData?.date || "June 13, 2038"}</span>
+          <span>{slideData?.date || "13 июня 2038 г."}</span>
         </div>
 
-        {/* Main Content */}
+        {/* Контент */}
         <div className="flex h-full px-16 pb-16">
-          {/* Title and Map on the left */}
+          {/* Левая часть: Заголовок и Карта */}
           <div className="flex flex-col items-center justify-center w-[48%] pr-8 h-full">
             <div className="flex flex-col items-left justify-center h-full w-full">
-              {/* Move the title down to align with the top of the market stats */}
               <h1
                 className="text-6xl font-bold text-blue-600 mb-8 leading-tight text-left"
-                style={{ marginTop: "112px" }} // 112px matches top-36 (9rem) of stats
+                style={{ marginTop: "112px" }}
               >
-                {slideData?.title || "Market Size"}
+                {slideData?.title || "Объем рынка"}
               </h1>
               <div className="w-full bg-[#CBE3CC] rounded-md mb-8 flex items-center justify-center">
                 {slideData?.mapImage?.__image_url__ && (
                   <img
                     src={slideData?.mapImage?.__image_url__}
-                    alt="Market World Map with Points"
+                    alt="Карта мира"
                     className="w-full object-contain rounded-md"
                     style={{ maxHeight: 220 }}
                   />
@@ -128,7 +126,7 @@ const MarketSizeSlideLayout: React.FC<MarketSizeSlideProps> = ({
             </div>
           </div>
 
-          {/* Market Stats on the right */}
+          {/* Правая часть: Статистика */}
           <div className="flex flex-col items-start justify-center w-[52%] gap-8">
             <div className="absolute top-36 right-10 w-[42%] space-y-10">
               {stats.map((stat, index) => (

@@ -2,19 +2,19 @@ import React from "react"
 import * as z from "zod"
 
 const layoutId = "SwiftTableOfContents"
-const layoutName = "Table Of Contents"
-const layoutDescription = "Swift: Table of contents with up to 10 items (title + description)"
+const layoutName = "Содержание"
+const layoutDescription = "Swift: Оглавление с поддержкой до 10 пунктов (заголовок + описание)"
 
 const ToCItemSchema = z
   .object({
-    title: z.string().min(3).max(40).default("Introduction"),
+    title: z.string().min(3).max(40).default("Введение"),
     description: z
       .string()
       .min(0)
       .max(60)
-      .default("A brief overview of the section."),
+      .default("Краткий обзор раздела."),
   })
-  .default({ title: "Introduction", description: "A brief overview of the section." })
+  .default({ title: "Введение", description: "Краткий обзор раздела." })
 
 const Schema = z
   .object({
@@ -22,41 +22,36 @@ const Schema = z
       .string()
       .min(3)
       .max(60)
-      .default("Table of Contents"),
+      .default("Содержание"),
     items: z
       .array(ToCItemSchema)
       .min(1)
       .max(10)
       .default([
-        { title: "Introduction", description: "A brief description of our company and goals." },
-        { title: "Our Team", description: "Leadership and core contributors." },
-        { title: "Timeline", description: "High-level execution plan and milestones." },
-        { title: "Recommendations", description: "Key suggestions based on initial requirements." },
-        { title: "Solution", description: "What we propose and why it works." },
-        { title: "Market", description: "Audience, segments, and opportunity size." },
-        { title: "Business Model", description: "How we create and capture value." },
-        { title: "Conclusion", description: "Closing notes and next steps." },
-        { title: "Business Model", description: "How we create and capture value." },
-        { title: "Conclusion", description: "Closing notes and next steps." },
+        { title: "Введение", description: "Краткое описание нашей компании и целей." },
+        { title: "Наша команда", description: "Руководство и ключевые участники." },
+        { title: "Таймлайн", description: "План реализации и основные этапы." },
+        { title: "Рекомендации", description: "Ключевые предложения на основе требований." },
+        { title: "Решение", description: "Что мы предлагаем и почему это работает." },
+        { title: "Рынок", description: "Аудитория, сегменты и объем возможностей." },
+        { title: "Бизнес-модель", description: "Как мы создаем и получаем ценность." },
+        { title: "Заключение", description: "Заключительные мысли и следующие шаги." },
       ]),
-    website: z.string().min(6).max(60).default("www.yourwebsite.com"),
+    website: z.string().min(6).max(60).default("www.vash-sayt.ru"),
   })
   .default({
-    title: "Table of Contents",
+    title: "Содержание",
     items: [
-      { title: "Introduction", description: "A brief description of our company and goals." },
-      { title: "Our Team", description: "Leadership and core contributors." },
-      { title: "Timeline", description: "High-level execution plan and milestones." },
-      { title: "Recommendations", description: "Key suggestions based on initial requirements." },
-      { title: "Solution", description: "What we propose and why it works." },
-      { title: "Market", description: "Audience, segments, and opportunity size." },
-      { title: "Business Model", description: "How we create and capture value." },
-      { title: "Conclusion", description: "Closing notes and next steps." },
-      { title: "Business Model", description: "How we create and capture value." },
-      { title: "Conclusion", description: "Closing notes and next steps." },
-
+      { title: "Введение", description: "Краткое описание нашей компании и целей." },
+      { title: "Наша команда", description: "Руководство и ключевые участники." },
+      { title: "Таймлайн", description: "План реализации и основные этапы." },
+      { title: "Рекомендации", description: "Ключевые предложения на основе требований." },
+      { title: "Решение", description: "Что мы предлагаем и почему это работает." },
+      { title: "Рынок", description: "Аудитория, сегменты и объем возможностей." },
+      { title: "Бизнес-модель", description: "Как мы создаем и получаем ценность." },
+      { title: "Заключение", description: "Заключительные мысли и следующие шаги." },
     ],
-    website: "www.yourwebsite.com",
+    website: "www.vash-sayt.ru",
   })
 
 type SlideData = z.infer<typeof Schema>
@@ -77,17 +72,19 @@ const TableOfContents: React.FC<SlideLayoutProps> = ({ data: slideData }) => {
       <div
         className=" w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video relative z-20 mx-auto overflow-hidden"
         style={{
-          fontFamily: "var(--heading-font-family,Albert Sans)",
+          fontFamily: "var(--heading-font-family, Albert Sans)",
           backgroundColor: "var(--card-background-color, #FFFFFF)",
         }}
       >
 
 
-        <div className="px-12 pt-3">
-          <h1 className="text-[48px] leading-[1.1] font-semibold" style={{ color: "var(--text-heading-color, #111827)" }}>{slideData?.title}</h1>
+        <div className="px-12 pt-10">
+          <h1 className="text-[48px] leading-[1.1] font-semibold" style={{ color: "var(--text-heading-color, #111827)" }}>
+            {slideData?.title || "Содержание"}
+          </h1>
         </div>
 
-        {/* List */}
+        {/* Список пунктов */}
         <div className="px-12 pt-8">
           <div className="grid grid-cols-2 gap-x-12 gap-y-6 max-w-[1180px]">
             {items.slice(0, 10).map((item, idx) => (
@@ -99,6 +96,7 @@ const TableOfContents: React.FC<SlideLayoutProps> = ({ data: slideData }) => {
                       style={{
                         fontSize: 48,
                         color: "var(--text-heading-color, #BFF4FF)",
+                        opacity: 0.8
                       }}
                     >
                       {String(idx + 1).padStart(2, "0")}
@@ -121,9 +119,11 @@ const TableOfContents: React.FC<SlideLayoutProps> = ({ data: slideData }) => {
           </div>
         </div>
 
-        {/* Footer (standardized like IntroSlideLayout) */}
+        {/* Футер */}
         <div className="absolute bottom-8 left-12 right-12 flex items-center">
-          <span className="text-[14px]" style={{ color: "var(--text-body-color, #6B7280)" }}>{slideData?.website}</span>
+          <span className="text-[14px]" style={{ color: "var(--text-body-color, #6B7280)" }}>
+            {slideData?.website}
+          </span>
           <div className="ml-6 h-[2px] flex-1" style={{ backgroundColor: "var(--text-heading-color, #111827)" }}></div>
         </div>
         <div className="absolute bottom-7 right-6 w-8 h-8 rotate-45" style={{ backgroundColor: "var(--text-heading-color, #111827)" }}></div>
@@ -134,5 +134,3 @@ const TableOfContents: React.FC<SlideLayoutProps> = ({ data: slideData }) => {
 
 export { Schema, layoutId, layoutName, layoutDescription }
 export default TableOfContents
-
-

@@ -2,33 +2,33 @@ import React from 'react'
 import * as z from "zod";
 
 export const layoutId = 'table-info-slide'
-export const layoutName = 'Table with Info'
-export const layoutDescription = 'A slide layout with a title at the top, structured table in the middle, and descriptive text at the bottom.'
+export const layoutName = 'Таблица с информацией'
+export const layoutDescription = 'Макет слайда с заголовком вверху, структурированной таблицей в центре и пояснительным текстом внизу.'
 
 const tableInfoSlideSchema = z.object({
-    title: z.string().min(3).max(40).default('Market Comparison').meta({
-        description: "Main title of the slide",
+    title: z.string().min(3).max(40).default('Сравнение рынка').meta({
+        description: "Основной заголовок слайда",
     }),
     tableData: z.object({
         headers: z.array(z.string().min(1).max(30)).min(2).max(5).meta({
-            description: "Table column headers"
+            description: "Заголовки столбцов таблицы"
         }),
         rows: z.array(z.array(z.string().min(1).max(50))).min(2).max(6).meta({
-            description: "Table rows data - each row should match the number of headers"
+            description: "Данные строк таблицы — каждая строка должна соответствовать количеству заголовков"
         })
     }).default({
-        headers: ['Company', 'Revenue', 'Growth', 'Market Share'],
+        headers: ['Компания', 'Выручка', 'Рост', 'Доля рынка'],
         rows: [
-            ['Company A', '$2.5M', '15%', '25%'],
-            ['Company B', '$1.8M', '12%', '18%'],
-            ['Company C', '$3.2M', '20%', '32%'],
-            ['Our Company', '$1.2M', '35%', '12%']
+            ['Компания А', '$2.5M', '15%', '25%'],
+            ['Компания Б', '$1.8M', '12%', '18%'],
+            ['Компания В', '$3.2M', '20%', '32%'],
+            ['Наша компания', '$1.2M', '35%', '12%']
         ]
     }).meta({
-        description: "Table structure with headers and rows"
+        description: "Структура таблицы с заголовками и строками"
     }),
-    description: z.string().min(10).max(200).default('This comparison shows our competitive position in the market. While we currently have a smaller market share, our growth rate significantly exceeds competitors, indicating strong potential for future expansion.').meta({
-        description: "Descriptive text that appears below the table",
+    description: z.string().min(10).max(200).default('Это сравнение демонстрирует нашу конкурентную позицию на рынке. Несмотря на текущую небольшую долю рынка, темпы нашего роста значительно превышают показатели конкурентов.').meta({
+        description: "Описательный текст, который отображается под таблицей",
     })
 })
 
@@ -41,17 +41,17 @@ interface TableInfoSlideLayoutProps {
 }
 
 const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slideData }) => {
-    const tableHeaders = slideData?.tableData?.headers || ['Company', 'Revenue', 'Growth', 'Market Share']
+    const tableHeaders = slideData?.tableData?.headers || ['Компания', 'Выручка', 'Рост', 'Доля рынка']
     const tableRows = slideData?.tableData?.rows || [
-        ['Company A', '$2.5M', '15%', '25%'],
-        ['Company B', '$1.8M', '12%', '18%'],
-        ['Company C', '$3.2M', '20%', '32%'],
-        ['Our Company', '$1.2M', '35%', '12%']
+        ['Компания А', '$2.5M', '15%', '25%'],
+        ['Компания Б', '$1.8M', '12%', '18%'],
+        ['Компания В', '$3.2M', '20%', '32%'],
+        ['Наша компания', '$1.2M', '35%', '12%']
     ]
 
     return (
         <>
-            {/* Import Google Fonts */}
+            {/* Импорт шрифтов Google Fonts */}
             <link
                 href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
                 rel="stylesheet"
@@ -60,12 +60,12 @@ const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slide
             <div
                 className="w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video bg-white relative z-20 mx-auto overflow-hidden flex flex-col"
                 style={{
-                    fontFamily: 'var(--heading-font-family,Inter)',
-                    background: "var(--card-background-color,#ffffff)"
+                    fontFamily: 'var(--heading-font-family, Poppins, Inter, sans-serif)',
+                    background: "var(--card-background-color, #ffffff)"
                 }}
             >
 
-                {/* Decorative Wave Patterns */}
+                {/* Декоративные фоновые элементы */}
                 <div className="absolute top-0 left-0 w-64 h-full opacity-10 overflow-hidden">
                     <svg className="w-full h-full" viewBox="0 0 200 400" fill="none">
                         <path d="M0 100C50 150 100 50 150 100C175 125 200 100 200 100V0H0V100Z" fill="#8b5cf6" opacity="0.3" />
@@ -82,34 +82,34 @@ const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slide
                     </svg>
                 </div>
 
-                {/* Main Content */}
+                {/* Основной контент */}
                 <div className="relative z-10 px-8 sm:px-12 lg:px-20 pt-12 py-8 flex-1 flex flex-col justify-between">
 
-                    {/* Title Section */}
+                    {/* Секция заголовка */}
                     <div className="text-center space-y-4">
-                        <h1 style={{ color: "var(--text-heading-color,#111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900">
-                            {slideData?.title || 'Market Comparison'}
+                        <h1 style={{ color: "var(--text-heading-color, #111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold">
+                            {slideData?.title || 'Сравнение рынка'}
                         </h1>
-                        {/* Purple accent line */}
-                        <div style={{ background: "var(--primary-accent-color,#9333ea)" }} className="w-20 h-1 bg-purple-600 mx-auto"></div>
+                        {/* Фиолетовая акцентная линия */}
+                        <div style={{ background: "var(--primary-accent-color, #9333ea)" }} className="w-20 h-1 mx-auto"></div>
                     </div>
 
-                    {/* Table Section */}
+                    {/* Секция таблицы */}
                     <div className="flex-1 flex items-center justify-center py-8">
                         <div className="w-full max-w-4xl">
-                            <div style={{ background: "var(--tertiary-accent-color,#e5e7eb)", borderColor: "var(--secondary-accent-color,#e5e7eb)" }} className="bg-white rounded-lg shadow-lg border overflow-hidden">
-                                {/* Table Header */}
-                                <div style={{ backgroundColor: "var(--primary-accent-color,#9333ea)" }}>
+                            <div style={{ borderColor: "var(--secondary-accent-color, #e5e7eb)" }} className="bg-white rounded-lg shadow-lg border overflow-hidden">
+                                {/* Шапка таблицы */}
+                                <div style={{ backgroundColor: "var(--primary-accent-color, #9333ea)" }}>
                                     <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }}>
                                         {tableHeaders.map((header, index) => (
-                                            <div key={index} className="px-6 py-4 font-semibold text-center text-sm sm:text-base" style={{ color: "var(--text-heading-color,#111827)" }}>
+                                            <div key={index} className="px-6 py-4 font-semibold text-center text-sm sm:text-base text-white">
                                                 {header}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Table Body */}
+                                {/* Тело таблицы */}
                                 <div className="divide-y divide-gray-200">
                                     {tableRows.map((row, rowIndex) => (
                                         <div
@@ -122,10 +122,7 @@ const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slide
                                                     key={cellIndex}
                                                     className="px-6 py-4 text-center text-sm sm:text-base"
                                                     style={{
-                                                        color: "var(--text-body-color,#4b5563)",
-                                                        background: cellIndex % 2 === 0
-                                                            ? "var(--secondary-accent-color,#e5e7eb)"
-                                                            : "var(--tertiary-accent-color,#f3f4f6)",
+                                                        color: "var(--text-body-color, #4b5563)",
                                                     }}
                                                 >
                                                     {cell}
@@ -136,14 +133,13 @@ const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slide
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    {/* Description Section */}
+                    {/* Секция описания */}
                     <div className="text-center space-y-4">
                         <div className="max-w-4xl mx-auto">
-                            <p style={{ color: "var(--text-body-color,#4b5563)" }} className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                                {slideData?.description || 'This comparison shows our competitive position in the market. While we currently have a smaller market share, our growth rate significantly exceeds competitors, indicating strong potential for future expansion.'}
+                            <p style={{ color: "var(--text-body-color, #4b5563)" }} className="text-sm sm:text-base leading-relaxed">
+                                {slideData?.description || 'Это сравнение демонстрирует нашу конкурентную позицию на рынке. Несмотря на текущую небольшую долю рынка, темпы нашего роста значительно превышают показатели конкурентов.'}
                             </p>
                         </div>
                     </div>
@@ -153,4 +149,4 @@ const TableInfoSlideLayout: React.FC<TableInfoSlideLayoutProps> = ({ data: slide
     )
 }
 
-export default TableInfoSlideLayout 
+export default TableInfoSlideLayout

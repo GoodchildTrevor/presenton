@@ -3,21 +3,21 @@ import * as z from "zod";
 import { ImageSchema } from '@/presentation-templates/defaultSchemes';
 
 export const layoutId = 'basic-info-slide'
-export const layoutName = 'Basic Info'
-export const layoutDescription = 'A clean slide layout with title, description text, and a supporting image.'
+export const layoutName = 'Основная информация'
+export const layoutDescription = 'Чистый макет слайда с заголовком, описанием и поддерживающим изображением.'
 
 const basicInfoSlideSchema = z.object({
-    title: z.string().min(3).max(40).default('Product Overview').meta({
-        description: "Main title of the slide",
+    title: z.string().min(3).max(40).default('Обзор продукта').meta({
+        description: "Основной заголовок слайда",
     }),
-    description: z.string().min(10).max(150).default('Our product offers customizable dashboards for real-time reporting and data-driven decisions. It integrates with third-party tools to enhance operations and scales with business growth for improved efficiency.').meta({
-        description: "Main description text content",
+    description: z.string().min(10).max(150).default('Наш продукт предлагает настраиваемые дашборды для отчетности в реальном времени и принятия решений на основе данных. Он интегрируется со сторонними инструментами для оптимизации операций.').meta({
+        description: "Основной текст описания",
     }),
     image: ImageSchema.default({
         __image_url__: 'https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
         __image_prompt__: 'Business team in meeting room discussing product features and solutions'
     }).meta({
-        description: "Supporting image for the slide",
+        description: "Поддерживающее изображение для слайда",
     })
 })
 
@@ -34,7 +34,7 @@ const BasicInfoSlideLayout: React.FC<BasicInfoSlideLayoutProps> = ({ data: slide
 
     return (
         <>
-            {/* Import Google Fonts */}
+            {/* Импорт шрифтов Google */}
             <link
                 href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
                 rel="stylesheet"
@@ -49,9 +49,9 @@ const BasicInfoSlideLayout: React.FC<BasicInfoSlideLayoutProps> = ({ data: slide
             >
 
 
-                {/* Main Content */}
+                {/* Основной контент */}
                 <div className="relative z-10 flex h-full px-8 sm:px-12 lg:px-20 pb-8">
-                    {/* Left Section - Image */}
+                    {/* Левая секция - Изображение */}
                     <div className="flex-1 flex items-center justify-center pr-8">
                         <div className="w-full max-w-lg h-80 rounded-2xl overflow-hidden shadow-lg">
                             <img
@@ -62,31 +62,27 @@ const BasicInfoSlideLayout: React.FC<BasicInfoSlideLayoutProps> = ({ data: slide
                         </div>
                     </div>
 
-                    {/* Right Section - Content */}
+                    {/* Правая секция - Контент */}
                     <div className="flex-1 flex flex-col justify-center pl-8 space-y-6">
-                        {/* Title */}
+                        {/* Заголовок */}
                         <h1 style={{ color: "var(--text-heading-color,#111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                            {slideData?.title || 'Product Overview'}
+                            {slideData?.title || 'Обзор продукта'}
                         </h1>
 
-                        {/* Purple accent line */}
+                        {/* Пурпурная акцентная линия */}
                         <div style={{ background: "var(--text-heading-color,#9333ea)" }} className="w-20 h-1 bg-purple-600"></div>
 
-                        {/* Description */}
+                        {/* Описание */}
                         <p style={{ color: "var(--text-body-color,#4b5563)" }} className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                            {slideData?.description || 'Our product offers customizable dashboards for real-time reporting and data-driven decisions. It integrates with third-party tools to enhance operations and scales with business growth for improved efficiency.'}
+                            {slideData?.description || 'Наш продукт предлагает настраиваемые дашборды для отчетности в реальном времени и принятия решений на основе данных. Он интегрируется со сторонними инструментами для оптимизации операций.'}
                         </p>
 
 
                     </div>
-
-
-
                 </div>
-
             </div>
         </>
     )
 }
 
-export default BasicInfoSlideLayout 
+export default BasicInfoSlideLayout

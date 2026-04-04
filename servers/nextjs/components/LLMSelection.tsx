@@ -71,12 +71,12 @@ export default function LLMProviderSelection({
         needsOllamaUrl ||
         needsFluxUrl,
       text: needsModelSelection
-        ? "Please Select a Model"
+        ? "Пожалуйста, выберите модель"
         : needsOllamaUrl
-        ? "Please Enter Ollama URL"
+        ? "Пожалуйста, введите URL Ollama"
         : needsFluxUrl
-        ? "Please Enter FLUX URL"
-        : "Save Configuration",
+        ? "Пожалуйста, введите URL FLUX"
+        : "Сохранить конфигурацию",
       showProgress: false,
     });
   }, [llmConfig]);
@@ -113,11 +113,9 @@ export default function LLMProviderSelection({
         updates.OLLAMA_URL = "http://localhost:11434";
       }
 
-      // Autofill FLUX_URL from environment variable if FLUX is selected but URL is missing
       if (!prevConfig.DISABLE_IMAGE_GENERATION &&
           prevConfig.IMAGE_PROVIDER === "flux" &&
           !prevConfig.FLUX_URL) {
-        // Try to get FLUX_URL from window object (set by server-side rendering)
         const fluxUrlFromWindow = (typeof window !== 'undefined' && (window as any).FLUX_URL) || undefined;
         if (fluxUrlFromWindow) {
           updates.FLUX_URL = fluxUrlFromWindow;
@@ -134,7 +132,7 @@ export default function LLMProviderSelection({
 
   return (
     <div className="h-full flex flex-col mt-10">
-      {/* Provider Selection - Fixed Header */}
+      {/* Выбор провайдера - Фиксированный заголовок */}
       <div className="p-2 rounded-2xl border border-gray-200">
         <Tabs
           value={llmConfig.LLM || "ollama"}
@@ -147,14 +145,14 @@ export default function LLMProviderSelection({
         </Tabs>
       </div>
 
-      {/* Scrollable Content */}
+      {/* Прокручиваемый контент */}
       <div className="flex-1 overflow-y-auto p-6 pt-0 custom_scrollbar">
         <Tabs
           value={llmConfig.LLM || "ollama"}
           onValueChange={handleProviderChange}
           className="w-full"
         >
-          {/* Ollama Content */}
+          {/* Контент Ollama */}
           <TabsContent value="ollama" className="mt-6">
             <OllamaConfig
               ollamaModel={llmConfig.OLLAMA_MODEL || ""}
@@ -165,11 +163,11 @@ export default function LLMProviderSelection({
           </TabsContent>
         </Tabs>
 
-        {/* Image Generation Toggle */}
+        {/* Переключатель генерации изображений */}
         <div className="my-8">
           <div className="flex items-center justify-between mb-4 bg-green-50 p-2 rounded-sm">
             <label className="text-sm font-medium text-gray-700">
-              Disable Image Generation
+              Отключить генерацию изображений
             </label>
             <Switch
               checked={isImageGenerationDisabled}
@@ -183,17 +181,16 @@ export default function LLMProviderSelection({
           </div>
           <p className="text-sm text-gray-500 flex items-center gap-2">
             <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-            When enabled, slides will not include automatically generated
-            images.
+            Если включено, слайды не будут содержать автоматически созданные изображения.
           </p>
         </div>
 
         {!isImageGenerationDisabled && (
           <>
-            {/* Image Provider Selection */}
+            {/* Выбор провайдера изображений */}
             <div className="my-8">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Select Image Provider
+                Выберите провайдера изображений
               </label>
               <div className="w-full">
                 <Popover
@@ -212,7 +209,7 @@ export default function LLMProviderSelection({
                           {llmConfig.IMAGE_PROVIDER
                             ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]
                                 ?.label || llmConfig.IMAGE_PROVIDER
-                            : "Select image provider"}
+                            : "Выберите провайдера"}
                         </span>
                       </div>
                       <ChevronsUpDown className="w-4 h-4 text-gray-500" />
@@ -224,9 +221,9 @@ export default function LLMProviderSelection({
                     style={{ width: "var(--radix-popover-trigger-width)" }}
                   >
                     <Command>
-                      <CommandInput placeholder="Search provider..." />
+                      <CommandInput placeholder="Поиск провайдера..." />
                       <CommandList>
-                        <CommandEmpty>No provider found.</CommandEmpty>
+                        <CommandEmpty>Провайдер не найден.</CommandEmpty>
                         <CommandGroup>
                           {Object.values(IMAGE_PROVIDERS).map(
                             (provider, index) => (
@@ -269,16 +266,16 @@ export default function LLMProviderSelection({
               </div>
             </div>
 
-            {/* FLUX URL Input */}
+            {/* Ввод URL FLUX */}
             {llmConfig.IMAGE_PROVIDER === "flux" && (
               <div className="mb-8">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  FLUX Server URL
+                  URL сервера FLUX
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Enter FLUX server URL"
+                    placeholder="Введите URL сервера FLUX"
                     className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                     value={llmConfig.FLUX_URL || ""}
                     onChange={(e) => {
@@ -288,37 +285,37 @@ export default function LLMProviderSelection({
                 </div>
                 <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
                   <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-                  URL for your FLUX image generation service
+                  URL вашего сервиса генерации изображений FLUX
                 </p>
               </div>
             )}
           </>
         )}
 
-        {/* Model Information */}
+        {/* Информация о модели */}
         <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-500 mt-0.5" />
             <div>
               <h3 className="text-sm font-medium text-blue-900 mb-1">
-                Selected Models
+                Выбранные модели
               </h3>
               <p className="text-sm text-blue-700">
-                Using{" "}
+                Используется{" "}
                 {llmConfig.LLM === "ollama"
-                  ? llmConfig.OLLAMA_MODEL || "Not selected"
-                  : "Not selected"}{" "}
-                for text generation{" "}
+                  ? llmConfig.OLLAMA_MODEL || "Не выбрано"
+                  : "Не выбрано"}{" "}
+                для генерации текста{" "}
                 {isImageGenerationDisabled ? (
-                  "and image generation is disabled."
+                  "и генерация изображений отключена."
                 ) : (
                   <>
-                    and{" "}
+                    и{" "}
                     {llmConfig.IMAGE_PROVIDER
                       ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]?.label ||
                         llmConfig.IMAGE_PROVIDER
-                      : "Not selected"}{" "}
-                    for images
+                      : "Не выбрано"}{" "}
+                    для изображений
                   </>
                 )}
               </p>

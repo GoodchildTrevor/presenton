@@ -5,19 +5,19 @@ import { IconSchema, ImageSchema } from '@/presentation-templates/defaultSchemes
 import { RemoteSvgIcon } from "@/app/hooks/useRemoteSvgIcon";
 
 const layoutId = "bullet-with-icons-title-description"
-const layoutName = "Bullet With Icons Title Description"
-const layoutDescription = "Bullet with icons with title and description and title and description for whole"
+const layoutName = "Список с иконками, заголовком и описанием"
+const layoutDescription = "Макет со списком иконок, заголовками и описаниями для каждого элемента, а также общим заголовком и пояснительным текстом."
 
 const ItemSchema = z
   .object({
     icon: IconSchema,
-    title: z.string().min(3).max(40).default("Lorem ipsum dolor"),
+    title: z.string().min(3).max(40).default("Заголовок элемента"),
     description: z
       .string()
       .min(0)
       .max(160)
       .default(
-        "Short supporting description that fits under the icon title."
+        "Краткое поддерживающее описание, которое располагается под заголовком иконки."
       ),
   })
   .default({
@@ -26,8 +26,8 @@ const ItemSchema = z
         "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/graduation-cap-bold.svg",
       __icon_query__: "feature icon",
     },
-    title: "Lorem ipsum dolor",
-    description: "Short supporting description that fits under the icon title.",
+    title: "Заголовок элемента",
+    description: "Краткое поддерживающее описание, которое располагается под заголовком иконки.",
   })
 
 const Schema = z
@@ -36,14 +36,14 @@ const Schema = z
       .string()
       .min(3)
       .max(60)
-      .default("Our Infographic"),
-    sideHeading: z.string().min(0).max(60).default("Lorem ipsum dolor sit amet,"),
+      .default("Наша инфографика"),
+    sideHeading: z.string().min(0).max(60).default("Дополнительный заголовок"),
     sideParagraph: z
       .string()
       .min(0)
       .max(300)
       .default(
-        "Concise paragraph describing context. Keep it short and readable across one or two lines."
+        "Краткий абзац, описывающий контекст. Старайтесь делать его лаконичным, чтобы он занимал одну или две строки."
       ),
     items: z
       .array(ItemSchema)
@@ -56,9 +56,9 @@ const Schema = z
               "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/graduation-cap-bold.svg",
             __icon_query__: "feature icon",
           },
-          title: "Lorem ipsum dolor",
+          title: "Первый пункт",
           description:
-            "Concise supporting text under the first icon explaining the point.",
+            "Лаконичный текст под первой иконкой, раскрывающий суть данного пункта.",
         },
         {
           icon: {
@@ -66,9 +66,9 @@ const Schema = z
               "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/user-bold.svg",
             __icon_query__: "feature icon",
           },
-          title: "Lorem ipsum dolor",
+          title: "Второй пункт",
           description:
-            "Concise supporting text under the second icon explaining the point.",
+            "Лаконичный текст под второй иконкой, раскрывающий суть данного пункта.",
         },
         {
           icon: {
@@ -76,9 +76,9 @@ const Schema = z
               "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/calendar-blank-bold.svg",
             __icon_query__: "feature icon",
           },
-          title: "Lorem ipsum dolor",
+          title: "Третий пункт",
           description:
-            "Concise supporting text under the third icon explaining the point.",
+            "Лаконичный текст под третьей иконкой, раскрывающий суть данного пункта.",
         },
         {
           icon: {
@@ -86,45 +86,41 @@ const Schema = z
               "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/x-bold.svg",
             __icon_query__: "feature icon",
           },
-          title: "Lorem ipsum dolor",
+          title: "Четвертый пункт",
           description:
-            "Concise supporting text under the fourth icon explaining the point.",
+            "Лаконичный текст под четвертой иконкой, раскрывающий суть данного пункта.",
         },
       ]),
-    website: z.string().min(6).max(60).default("www.yourwebsite.com"),
+    website: z.string().min(6).max(60).default("www.vash-sayt.ru"),
   })
   .default({
-    title: "Our Infographic",
-    sideHeading: "Lorem ipsum dolor sit amet,",
+    title: "Наша инфографика",
+    sideHeading: "Дополнительный заголовок",
     sideParagraph:
-      "Concise paragraph describing context. Keep it short and readable across one or two lines.",
+      "Краткий абзац, описывающий контекст. Старайтесь делать его лаконичным, чтобы он занимал одну или две строки.",
     items: [
       {
         icon: { __icon_url__: "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/graduation-cap-bold.svg", __icon_query__: "feature icon" },
-        title: "Lorem ipsum dolor",
-        description:
-          "Concise supporting text under the first icon explaining the point.",
+        title: "Первый пункт",
+        description: "Лаконичный текст под первой иконкой, раскрывающий суть данного пункта.",
       },
       {
         icon: { __icon_url__: "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/user-bold.svg", __icon_query__: "feature icon" },
-        title: "Lorem ipsum dolor",
-        description:
-          "Concise supporting text under the second icon explaining the point.",
+        title: "Второй пункт",
+        description: "Лаконичный текст под второй иконкой, раскрывающий суть данного пункта.",
       },
       {
         icon: { __icon_url__: "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/calendar-blank-bold.svg", __icon_query__: "feature icon" },
-        title: "Lorem ipsum dolor",
-        description:
-          "Concise supporting text under the third icon explaining the point.",
+        title: "Третий пункт",
+        description: "Лаконичный текст под третьей иконкой, раскрывающий суть данного пункта.",
       },
       {
         icon: { __icon_url__: "https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/x-bold.svg", __icon_query__: "feature icon" },
-        title: "Lorem ipsum dolor",
-        description:
-          "Concise supporting text under the fourth icon explaining the point.",
+        title: "Четвертый пункт",
+        description: "Лаконичный текст под четвертой иконкой, раскрывающий суть данного пункта.",
       },
     ],
-    website: "www.yourwebsite.com",
+    website: "www.vash-sayt.ru",
   })
 
 type SlideData = z.infer<typeof Schema>
@@ -157,21 +153,19 @@ const InfographicFourIcons: React.FC<SlideLayoutProps> = ({ data }) => {
       />
 
       <div
-        className=" w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video relative z-20 mx-auto overflow-hidden"
+        className="w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video relative z-20 mx-auto overflow-hidden"
         style={{
-          fontFamily: "var(--heading-font-family,Albert Sans)",
+          fontFamily: "var(--heading-font-family, 'Albert Sans', sans-serif)",
           backgroundColor: "var(--card-background-color, #FFFFFF)",
         }}
       >
-
-
-        {/* Title + right paragraph */}
-        <div className="px-12 pt-2">
+        {/* Заголовок + правый абзац */}
+        <div className="px-12 pt-8">
           <div className="grid grid-cols-[1.2fr_1fr] gap-10 items-start">
             <div className="text-[56px] leading-[1.05] font-semibold" style={{ color: "var(--text-heading-color, #111827)" }}>
               {renderTitle(slideData.title)}
             </div>
-            <div>
+            <div className="mt-2">
               {slideData.sideHeading && (
                 <div className="text-[16px] mb-2 font-semibold" style={{ color: "var(--text-heading-color, #111827)" }}>
                   {slideData.sideHeading}
@@ -186,17 +180,17 @@ const InfographicFourIcons: React.FC<SlideLayoutProps> = ({ data }) => {
           </div>
         </div>
 
-        {/* Icons row */}
+        {/* Ряд иконок */}
         <div className="px-12 pt-12">
           <div className="grid grid-flow-col auto-cols-[260px] gap-8 justify-center">
             {items.slice(0, 4).map((item, idx) => (
               <div key={idx} className="flex flex-col items-center text-center">
                 <div className="relative">
                   <div
-                    className="w-40 h-40 rounded-full flex items-center justify-center shadow"
+                    className="w-40 h-40 rounded-full flex items-center justify-center shadow-sm"
                     style={{ backgroundColor: 'var(--primary-accent-color, #BFF4FF)' }}
                   >
-                    {/* Icon */}
+                    {/* Иконка */}
                     <RemoteSvgIcon
                       url={item.icon.__icon_url__}
                       strokeColor={"currentColor"}
@@ -217,7 +211,7 @@ const InfographicFourIcons: React.FC<SlideLayoutProps> = ({ data }) => {
           </div>
         </div>
 
-        {/* Footer (standardized like IntroSlideLayout) */}
+        {/* Футер */}
         <div className="absolute bottom-8 left-12 right-12 flex items-center">
           <span className="text-[14px]" style={{ color: "var(--text-body-color, #6B7280)" }}>{slideData.website}</span>
           <div className="ml-6 h-[2px] flex-1" style={{ backgroundColor: "var(--text-heading-color, #111827)" }}></div>
@@ -230,5 +224,3 @@ const InfographicFourIcons: React.FC<SlideLayoutProps> = ({ data }) => {
 
 export { Schema, layoutId, layoutName, layoutDescription }
 export default InfographicFourIcons
-
-

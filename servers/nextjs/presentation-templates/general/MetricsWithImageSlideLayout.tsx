@@ -3,41 +3,40 @@ import * as z from "zod";
 import { ImageSchema } from '@/presentation-templates/defaultSchemes';
 
 export const layoutId = 'metrics-with-image-slide'
-export const layoutName = 'Metrics with Image'
-export const layoutDescription = 'A slide layout with supporting image on the left and title, description, and metrics grid on the right. Can be used alternatively with MetricSlide.'
+export const layoutName = 'Показатели с изображением'
+export const layoutDescription = 'Макет слайда с поддерживающим изображением слева и заголовком, описанием и сеткой показателей справа.'
 
 const metricsWithImageSlideSchema = z.object({
-    title: z.string().min(3).max(40).default('Competitive Advantage').meta({
-        description: "Main title of the slide",
+    title: z.string().min(3).max(40).default('Конкурентное преимущество').meta({
+        description: "Основной заголовок слайда",
     }),
-    description: z.string().min(10).max(150).default('Ginyard International Co. stands out by offering custom digital solutions tailored to client needs, alongside long-term support to ensure lasting relationships and continuous adaptation.').meta({
-        description: "Description text below the title",
+    description: z.string().min(10).max(150).default('Ginyard International Co. выделяется на рынке, предлагая индивидуальные цифровые решения, адаптированные под нужды клиентов, в сочетании с долгосрочной поддержкой.').meta({
+        description: "Текст описания под заголовком",
     }),
     image: ImageSchema.default({
         __image_url__: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
         __image_prompt__: 'Person holding tablet with analytics dashboard and charts'
     }).meta({
-        description: "Supporting image for the slide",
+        description: "Поддерживающее изображение для слайда",
     }),
     metrics: z.array(z.object({
         label: z.string().min(2).max(100).meta({
-            description: "Metric label/title"
+            description: "Название/заголовок показателя"
         }),
         value: z.string().min(1).max(20).meta({
-            description: "Metric value (e.g., 200+, 95%, 50%)"
+            description: "Значение показателя (например, 200+, 95%, 50%)"
         }),
     })).min(1).max(3).default([
         {
-            label: 'Satisfied Clients',
+            label: 'Довольных клиентов',
             value: '200+'
         },
         {
-            label: 'Client Retention Rate',
+            label: 'Уровень удержания',
             value: '95%'
         },
-
     ]).meta({
-        description: "List of key business metrics to display",
+        description: "Список ключевых бизнес-показателей для отображения",
     })
 })
 
@@ -62,12 +61,12 @@ const MetricsWithImageSlideLayout: React.FC<MetricsWithImageSlideLayoutProps> = 
             <div
                 className="w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video bg-white relative z-20 mx-auto overflow-hidden"
                 style={{
-                    fontFamily: 'var(--heading-font-family,Inter)',
-                    background: "var(--card-background-color,#ffffff)"
+                    fontFamily: 'var(--heading-font-family, Poppins, Inter, sans-serif)',
+                    background: "var(--card-background-color, #ffffff)"
                 }}
             >
 
-                {/* Decorative Wave Patterns */}
+                {/* Декоративные волнообразные узоры */}
                 <div className="absolute bottom-0 left-0 w-48 h-48 opacity-10 overflow-hidden">
                     <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
                         <path d="M0 100C50 75 100 125 150 100C175 87.5 200 100 200 100V200H0V100Z" fill="#8b5cf6" opacity="0.4" />
@@ -81,9 +80,9 @@ const MetricsWithImageSlideLayout: React.FC<MetricsWithImageSlideLayoutProps> = 
                     </svg>
                 </div>
 
-                {/* Main Content */}
+                {/* Основной контент */}
                 <div className="relative z-10 flex h-full px-8 sm:px-12 lg:px-20 pt-12 pb-8">
-                    {/* Left Section - Image */}
+                    {/* Левая секция - Изображение */}
                     <div className="flex-1 flex items-center justify-center pr-8">
                         <div className="w-full max-w-lg h-96 rounded-2xl overflow-hidden shadow-lg">
                             <img
@@ -94,26 +93,26 @@ const MetricsWithImageSlideLayout: React.FC<MetricsWithImageSlideLayoutProps> = 
                         </div>
                     </div>
 
-                    {/* Right Section - Content and Metrics */}
+                    {/* Правая секция - Контент и показатели */}
                     <div className="flex-1 flex flex-col justify-center pl-8 space-y-6">
-                        {/* Title */}
-                        <h1 style={{ color: "var(--text-heading-color,#111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                            {slideData?.title || 'Competitive Advantage'}
+                        {/* Заголовок */}
+                        <h1 style={{ color: "var(--text-heading-color, #111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                            {slideData?.title || 'Конкурентное преимущество'}
                         </h1>
 
-                        {/* Description */}
-                        <p style={{ color: "var(--text-body-color,#4b5563)" }} className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                            {slideData?.description || 'Ginyard International Co. stands out by offering custom digital solutions tailored to client needs, alongside long-term support to ensure lasting relationships and continuous adaptation.'}
+                        {/* Описание */}
+                        <p style={{ color: "var(--text-body-color, #4b5563)" }} className="text-base sm:text-lg leading-relaxed">
+                            {slideData?.description || 'Ginyard International Co. выделяется на рынке, предлагая индивидуальные цифровые решения, адаптированные под нужды клиентов, в сочетании с долгосрочной поддержкой.'}
                         </p>
 
-                        {/* Metrics Grid */}
+                        {/* Сетка показателей */}
                         <div className="grid grid-cols-2 gap-6">
                             {metrics.map((metric, index) => (
                                 <div key={index} className="text-center space-y-2">
-                                    <div style={{ color: "var(--text-body-color,#4b5563)" }} className="text-sm text-gray-600 font-medium">
+                                    <div style={{ color: "var(--text-body-color, #4b5563)" }} className="text-sm font-medium">
                                         {metric.label}
                                     </div>
-                                    <div style={{ color: "var(--text-heading-color,#9333ea)" }} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-purple-600">
+                                    <div style={{ color: "var(--primary-accent-color, #9333ea)" }} className="text-3xl sm:text-4xl lg:text-5xl font-bold">
                                         {metric.value}
                                     </div>
                                 </div>
@@ -126,4 +125,4 @@ const MetricsWithImageSlideLayout: React.FC<MetricsWithImageSlideLayoutProps> = 
     )
 }
 
-export default MetricsWithImageSlideLayout 
+export default MetricsWithImageSlideLayout

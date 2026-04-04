@@ -12,26 +12,26 @@ import {
 } from "recharts";
 
 export const layoutId = "business-model-slide";
-export const layoutName = "Business Model Slide";
+export const layoutName = "Слайд бизнес-модели";
 export const layoutDescription =
-  "A business model presentation slide displaying CAC metrics and monetization strategy.";
+  "Слайд презентации бизнес-модели, отображающий метрики CAC и стратегию монетизации.";
 
 const businessModelSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
-    description: "Company name displayed in header",
+  companyName: z.string().min(2).max(50).default("Название компании").meta({
+    description: "Название компании, отображаемое в заголовке",
   }),
-  date: z.string().min(5).max(50).default("June 13, 2038").meta({
-    description: "Today Date displayed in header",
+  date: z.string().min(5).max(50).default("13 июня 2038 г.").meta({
+    description: "Текущая дата, отображаемая в заголовке",
   }),
-  title: z.string().min(3).max(20).default("Business Model"),
+  title: z.string().min(3).max(20).default("Бизнес-модель"),
   description: z
     .string()
     .default(
-      "Describe how you monetize, who your customers are, your distribution channels or fee structure. The goal is to give an idea of how this business will sustain your product or service and explain how your company will make money and achieve its goals. This can be shown with graphs, statistics, or charts. Use the Lifetime Value (LTV) and Customer Acquisition Cost (CAC) metrics to provide a clearer picture.",
+      "Опишите, как вы монетизируете продукт, кто ваши клиенты, каковы каналы сбыта или структура комиссий. Цель — дать представление о том, как этот бизнес будет поддерживать ваш продукт или услугу, и объяснить, как компания будет зарабатывать деньги и достигать своих целей. Это можно показать с помощью графиков, статистики или диаграмм. Используйте показатели пожизненной ценности клиента (LTV) и стоимости привлечения клиента (CAC) для более наглядной картины.",
     )
     .meta({
       description:
-        "Description of the business model, monetization strategy, and customer acquisition costs.",
+        "Описание бизнес-модели, стратегии монетизации и затрат на привлечение клиентов.",
     }),
   cacChart: z
     .array(
@@ -43,15 +43,15 @@ const businessModelSchema = z.object({
     .min(2)
     .max(5)
     .default([
-      { label: "Internet of Things", percentage: 70 },
-      { label: "Artificial Intelligence", percentage: 60 },
-      { label: "Blockchain", percentage: 50 },
-      { label: "Cloud Computing", percentage: 40 },
-      { label: "Cybersecurity", percentage: 30 },
+      { label: "Интернет вещей", percentage: 70 },
+      { label: "ИИ", percentage: 60 },
+      { label: "Блокчейн", percentage: 50 },
+      { label: "Облака", percentage: 40 },
+      { label: "Кибербезопасность", percentage: 30 },
     ])
     .meta({
       description:
-        "Array of objects representing Customer Acquisition Cost (CAC) metrics for different business segments or channels. Each object should include a 'label' (the name of the segment or channel) and a 'percentage' (the CAC as a percentage value, from 0 to 100). This data is visualized in the bar chart to illustrate the distribution of CAC across various categories.",
+        "Массив объектов, представляющих стоимость привлечения клиентов (CAC) для различных сегментов бизнеса или каналов. Каждый объект должен включать 'label' (название сегмента) и 'percentage' (значение CAC в процентах от 0 до 100). Эти данные визуализируются на гистограмме.",
     }),
 });
 
@@ -74,20 +74,20 @@ const BusinessModelSlide: React.FC<Props> = ({ data }) => {
         rel="stylesheet"
       />
       <div
-        className="w-full max-w-[1280px] max-h-[720px] aspect-video bg-white mx-auto rounded shadow-lg overflow-hidden relative z-20"
+        className="w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video bg-white mx-auto relative z-20 overflow-hidden"
         style={{
           fontFamily: "Montserrat, sans-serif",
         }}
       >
-        {/* Header */}
+        {/* Шапка */}
         <div className="absolute top-8 left-10 right-10 flex justify-between items-center text-[#1E4CD9] text-sm font-semibold">
           <span>{data?.companyName}</span>
           <span>{data?.date}</span>
         </div>
 
-        {/* Main Content */}
+        {/* Основной контент */}
         <div className="px-16 py-16 flex h-full gap-8">
-          {/* Left Column - Chart with Title Below */}
+          {/* Левая колонка - График и заголовок */}
           <div className="flex-1 pr-12 flex flex-col justify-center">
             <h1 className="text-6xl font-bold text-blue-600 mb-4 leading-tight text-left">
               {data?.title}
@@ -104,7 +104,7 @@ const BusinessModelSlide: React.FC<Props> = ({ data }) => {
                       <CartesianGrid stroke="#e5eafe" />
                       <XAxis
                         dataKey="label"
-                        tick={{ fill: "#1E4CD9", fontWeight: 600 }}
+                        tick={{ fill: "#1E4CD9", fontWeight: 600, fontSize: 12 }}
                       />
                       <YAxis
                         tick={{ fill: "#1E4CD9", fontWeight: 600 }}
@@ -139,7 +139,7 @@ const BusinessModelSlide: React.FC<Props> = ({ data }) => {
             )}
           </div>
 
-          {/* Right Column - Description and Optional Image */}
+          {/* Правая колонка - Описание */}
           <div className="flex flex-col items-start justify-center w-[52%] gap-8">
             <p className="text-blue-600 text-base leading-relaxed font-normal mb-6 max-w-xl text-left">
               {data?.description}

@@ -6,31 +6,31 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Cell, ResponsiveContainer } from "recharts";
 
 export const layoutId = 'chart-with-bullets-slide'
-export const layoutName = 'Chart with Bullet Boxes'
-export const layoutDescription = 'A slide layout with title, description, chart on the left and colored bullet boxes with icons on the right. Only choose this if data is available.'
+export const layoutName = 'График со списком'
+export const layoutDescription = 'Макет слайда с заголовком, описанием, графиком слева и блоками с иконками справа. Выбирайте этот вариант только при наличии данных для графика.'
 
 const barPieLineAreaChartDataSchema = z.object({
     type: z.union([z.literal('bar'), z.literal('pie'), z.literal('line'), z.literal('area')]),
     data: z.array(z.object({
-        name: z.string().meta({ description: "Data point name" }),
-        value: z.number().meta({ description: "Data point value" }),
+        name: z.string().meta({ description: "Название точки данных" }),
+        value: z.number().meta({ description: "Значение точки данных" }),
     })).min(2).max(5)
 })
 
 const scatterChartDataSchema = z.object({
     type: z.literal('scatter'),
     data: z.array(z.object({
-        x: z.number().meta({ description: "X coordinate" }),
-        y: z.number().meta({ description: "Y coordinate" }),
+        x: z.number().meta({ description: "Координата X" }),
+        y: z.number().meta({ description: "Координата Y" }),
     })).min(2).max(20)
 })
 
 const chartWithBulletsSlideSchema = z.object({
-    title: z.string().min(3).max(40).default('Market Size').meta({
-        description: "Main title of the slide",
+    title: z.string().min(3).max(40).default('Объем рынка').meta({
+        description: "Основной заголовок слайда",
     }),
-    description: z.string().min(10).max(150).default('Businesses face challenges with outdated technology and rising costs, limiting efficiency and growth in competitive markets.').meta({
-        description: "Description text below the title",
+    description: z.string().min(10).max(150).default('Бизнес сталкивается с проблемами из-за устаревших технологий и растущих затрат, что ограничивает эффективность и рост.').meta({
+        description: "Текст описания под заголовком",
     }),
     chartData: z.union([barPieLineAreaChartDataSchema, scatterChartDataSchema]).default({
         type: 'scatter',
@@ -44,54 +44,53 @@ const chartWithBulletsSlideSchema = z.object({
     }
     ),
     color: z.string().default('#3b82f6').meta({
-        description: "Primary color for chart elements",
+        description: "Основной цвет элементов графика",
     }),
     showLegend: z.boolean().default(false).meta({
-        description: "Whether to show chart legend",
+        description: "Показывать ли легенду графика",
     }),
     showTooltip: z.boolean().default(true).meta({
-        description: "Whether to show chart tooltip",
+        description: "Показывать ли всплывающую подсказку",
     }),
     bulletPoints: z.array(z.object({
         title: z.string().min(2).max(80).meta({
-            description: "Bullet point title",
+            description: "Заголовок пункта списка",
         }),
         description: z.string().min(10).max(150).meta({
-            description: "Bullet point description",
+            description: "Описание пункта списка",
         }),
         icon: IconSchema,
     })).min(1).max(3).default([
         {
-            title: 'Total Addressable Market',
-            description: 'Companies can use TAM to plan future expansion and investment.',
+            title: 'Общий объем целевого рынка',
+            description: 'Компании могут использовать TAM для планирования будущего расширения и инвестиций.',
             icon: {
                 __icon_url__: 'https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/chart-line-up-bold.svg',
                 __icon_query__: 'target market scope'
             }
         },
         {
-            title: 'Serviceable Available Market',
-            description: 'Indicates more measurable market segments for sales efforts.',
+            title: 'Объем доступного рынка',
+            description: 'Указывает на более измеримые сегменты рынка для усилий по продажам.',
             icon: {
                 __icon_url__: 'https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/chart-line-up-bold.svg',
                 __icon_query__: 'pie chart analysis'
             }
         },
         {
-            title: 'Serviceable Obtainable Market',
-            description: 'Help companies plan development strategies according to the market.',
+            title: 'Объем реально достижимого рынка',
+            description: 'Помогает компаниям планировать стратегии развития в соответствии с рынком.',
             icon: {
                 __icon_url__: 'https://presenton-public.s3.ap-southeast-1.amazonaws.com/static/icons/bold/chart-line-up-bold.svg',
                 __icon_query__: 'trending up growth'
             }
         }
     ]).meta({
-        description: "List of bullet points with colored boxes and icons",
+        description: "Список пунктов с цветными блоками и иконками",
     })
 })
 
 export const Schema = chartWithBulletsSlideSchema
-
 
 export type ChartWithBulletsSlideData = z.infer<typeof chartWithBulletsSlideSchema>
 
@@ -101,22 +100,12 @@ interface ChartWithBulletsSlideLayoutProps {
 
 const chartConfig = {
     value: {
-        label: "Value",
+        label: "Значение",
     },
     name: {
-        label: "Name",
+        label: "Наименование",
     },
 };
-
-const CHART_COLORS = [
-    '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-];
-
-const BULLET_COLORS = [
-    '#7F31E9', '#2C78DA', '#F58AAB', '#10b981', '#f59e0b',
-    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-];
 
 const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = ({ data: slideData }) => {
     const chartData = slideData?.chartData?.data || [];
@@ -146,7 +135,7 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
             case 'bar':
                 return (
                     <BarChart {...commonProps}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={color} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={color} opacity={0.2} />
                         <XAxis dataKey={xAxis} tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         <YAxis tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         {showTooltip && <ChartTooltip content={<ChartTooltipContent />} />}
@@ -158,7 +147,7 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
             case 'line':
                 return (
                     <LineChart {...commonProps}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={color} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={color} opacity={0.2} />
                         <XAxis dataKey={xAxis} tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         <YAxis tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         {showTooltip && <ChartTooltip content={<ChartTooltipContent />} />}
@@ -176,7 +165,7 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
             case 'area':
                 return (
                     <AreaChart {...commonProps}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={color} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={color} opacity={0.2} />
                         <XAxis dataKey={xAxis} tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         <YAxis tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         {showTooltip && <ChartTooltip content={<ChartTooltipContent />} />}
@@ -215,23 +204,22 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
             case 'scatter':
                 return (
                     <ScatterChart {...commonProps}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={color} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={color} opacity={0.2} />
                         <XAxis dataKey={xAxis} type="number" tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         <YAxis dataKey={yAxis} type="number" tick={{ fill: 'var(--text-body-color,#4b5563)', fontWeight: 600 }} />
                         {showTooltip && <ChartTooltip content={<ChartTooltipContent />} />}
                         {showLegend && <ChartLegend content={<ChartLegendContent />} />}
-                        <Scatter dataKey="value" fill={color} />
+                        <Scatter dataKey="y" fill={color} />
                     </ScatterChart>
                 );
 
             default:
-                return <div>Unsupported chart type</div>;
+                return <div className="flex items-center justify-center h-full text-gray-400 text-sm italic">Тип графика не поддерживается</div>;
         }
     };
 
     return (
         <>
-
             <link
                 href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
                 rel="stylesheet"
@@ -240,34 +228,32 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
             <div
                 className="w-full rounded-sm max-w-[1280px] shadow-lg max-h-[720px] aspect-video bg-white relative z-20 mx-auto overflow-hidden"
                 style={{
-                    fontFamily: 'var(--heading-font-family,Inter)',
+                    fontFamily: 'var(--heading-font-family, Inter, sans-serif)',
                     background: "var(--card-background-color,#ffffff)"
                 }}
             >
-
-                {/* Main Content */}
+                {/* Основной контент */}
                 <div className="flex h-full px-8 sm:px-12 lg:px-20 pt-8 pb-8">
-                    {/* Left Section - Title, Description, Chart */}
+                    {/* Левая секция - Заголовок, Описание, График */}
                     <div className="flex-1 flex flex-col pr-8">
-                        {/* Title */}
                         <h1 style={{ color: "var(--text-heading-color,#111827)" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-                            {slideData?.title || 'Market Size'}
+                            {slideData?.title}
                         </h1>
 
-                        {/* Description */}
                         <p style={{ color: "var(--text-body-color,#4b5563)" }} className="text-base text-gray-700 leading-relaxed mb-8">
-                            {slideData?.description || 'Businesses face challenges with outdated technology and rising costs, limiting efficiency and growth in competitive markets.'}
+                            {slideData?.description}
                         </p>
 
-                        {/* Chart Container */}
                         <div className="flex-1 rounded-lg shadow-sm border border-gray-100 p-4" style={{ background: 'var(--primary-accent-color,#F5F8FE)' }}>
                             <ChartContainer config={chartConfig} className="h-full w-full">
-                                {renderChart()}
+                                <ResponsiveContainer width="100%" height="100%">
+                                    {renderChart()}
+                                </ResponsiveContainer>
                             </ChartContainer>
                         </div>
                     </div>
 
-                    {/* Right Section - Bullet Point Boxes */}
+                    {/* Правая секция - Пункты списка */}
                     <div className="flex-shrink-0 w-80 flex flex-col justify-center space-y-4">
                         {bulletPoints.map((bullet, index) => (
                             <div
@@ -277,14 +263,13 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
                                     backgroundColor: 'var(--primary-accent-color,#9333ea)'
                                 }}
                             >
-                                {/* Icon and Title */}
                                 <div className="flex items-center space-x-3 mb-3">
-                                    <div style={{ background: "var(--primary-accent-color,#9333ea)" }} className="w-8 h-8 rounded-lg flex items-center justify-center">
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/20">
                                         <RemoteSvgIcon
                                             url={bullet.icon.__icon_url__}
                                             strokeColor={"currentColor"}
                                             className="w-5 h-5"
-                                            color="var(--text-heading-color,#ffffff)"
+                                            color="white"
                                             title={bullet.icon.__icon_query__}
                                         />
                                     </div>
@@ -293,7 +278,6 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
                                     </h3>
                                 </div>
 
-                                {/* Description */}
                                 <p style={{ color: "var(--text-body-color,#ffffff)" }} className="text-sm leading-relaxed opacity-90">
                                     {bullet.description}
                                 </p>
@@ -306,4 +290,4 @@ const ChartWithBulletsSlideLayout: React.FC<ChartWithBulletsSlideLayoutProps> = 
     )
 }
 
-export default ChartWithBulletsSlideLayout 
+export default ChartWithBulletsSlideLayout;
