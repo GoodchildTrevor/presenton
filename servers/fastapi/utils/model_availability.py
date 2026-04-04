@@ -1,4 +1,3 @@
-from constants.supported_ollama_models import SUPPORTED_OLLAMA_MODELS
 from enums.image_provider import ImageProvider
 from enums.llm_provider import LLMProvider
 from utils.get_env import (
@@ -22,9 +21,8 @@ async def check_llm_and_image_provider_api_or_model_availability():
             if not ollama_model:
                 raise Exception("OLLAMA_MODEL must be provided")
 
-            if ollama_model not in SUPPORTED_OLLAMA_MODELS:
-                raise Exception(f"Model {ollama_model} is not supported")
-
+            # Allow any model to be pulled from Ollama
+            # Model validation happens dynamically when listing available models
             print("-" * 50)
             print("Pulling model: ", ollama_model)
             async for event in pull_ollama_model(ollama_model):

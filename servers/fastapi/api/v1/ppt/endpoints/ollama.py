@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
-import json
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.v1.ppt.background_tasks import pull_ollama_model_background_task
-from constants.supported_ollama_models import SUPPORTED_OLLAMA_MODELS
+from constants.supported_ollama_models import get_available_or_suggested_models
 from models.ollama_model_metadata import OllamaModelMetadata
 from models.ollama_model_status import OllamaModelStatus
 from models.sql.ollama_pull_status import OllamaPullStatus
@@ -16,8 +15,8 @@ OLLAMA_ROUTER = APIRouter(prefix="/ollama", tags=["Ollama"])
 
 
 @OLLAMA_ROUTER.get("/models/supported", response_model=List[OllamaModelMetadata])
-def get_supported_models():
-    return SUPPORTED_OLLAMA_MODELS.values()
+async def get_supported_models():
+    return await get_available_or_suggested_models()
 
 
 @OLLAMA_ROUTER.get("/models/available", response_model=List[OllamaModelStatus])
@@ -31,13 +30,7 @@ async def pull_model(
     background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_container_db_async_session),
 ):
-
-    if model not in SUPPORTED_OLLAMA_MODELS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Model {model} is not supported",
-        )
-
+    # Check if model is already pulled
     try:
         pulled_models = await list_pulled_ollama_models()
         filtered_models = [
