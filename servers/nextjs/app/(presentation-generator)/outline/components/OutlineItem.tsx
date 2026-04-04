@@ -169,7 +169,7 @@ export function OutlineItem({
                 {/* Action Buttons */}
                 <div className="flex gap-1 sm:gap-2 items-center">
 
-                    <ToolTip content="Delete Slide">
+                    <ToolTip content="Удалить слайд">
                         <button
                             onClick={handleSlideDelete}
                             className="p-1.5 sm:p-2 bg-gray-200/50 hover:bg-gray-200 rounded-lg transition-colors"
@@ -185,4 +185,3 @@ export function OutlineItem({
         </div>
     )
 }
-
