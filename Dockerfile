@@ -36,6 +36,17 @@ RUN pip install /tmp/torchvision-0.25.0+cpu-cp311-cp311-manylinux_2_28_x86_64.wh
 RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
     --timeout 600
 
+# Pre-download ChromaDB ONNX embedding model so it's baked into the image
+# and never downloaded at container startup
+RUN python3 -c "\
+import os; \
+os.makedirs('chroma/models', exist_ok=True); \
+from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2; \
+ef = ONNXMiniLM_L6_V2(); \
+ef.DOWNLOAD_PATH = 'chroma/models'; \
+ef._download_model_if_not_exists(); \
+print('ChromaDB ONNX model cached successfully.')"
+
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
 COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
