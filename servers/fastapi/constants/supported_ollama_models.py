@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List
 
 from models.ollama_model_metadata import OllamaModelMetadata
@@ -43,16 +44,23 @@ async def get_supported_ollama_models_list() -> List[OllamaModelMetadata]:
     models_dict = await get_supported_ollama_models()
     return list(models_dict.values())
 
-SUGGESTED_MODELS = [
-    OllamaModelMetadata(label="Llama 3.2:3b", value="llama3.2:3b", size="2GB"),
-]
+
+def _get_suggested_models() -> List[OllamaModelMetadata]:
+    """Build suggested models list from env, falling back to llama3.2:3b."""
+    model_name = os.environ.get("OLLAMA_MODEL", "llama3.2:3b")
+    return [
+        OllamaModelMetadata(label=model_name, value=model_name, size=""),
+    ]
+
+
+SUGGESTED_MODELS = _get_suggested_models()
 
 
 async def get_available_or_suggested_models() -> List[OllamaModelMetadata]:
     """Get available models, or suggested models if none are pulled."""
     models = await get_supported_ollama_models_list()
     if not models:
-        return SUGGESTED_MODELS
+        return _get_suggested_models()
     return models
 
 
