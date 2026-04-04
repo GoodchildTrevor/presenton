@@ -26,7 +26,6 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
   const [summaryMap, setSummaryMap] = React.useState<Record<string, { lastUpdatedAt?: number; name?: string; description?: string }>>({});
 
   useEffect(() => {
-    // Fetch custom templates summary to get last_updated_at and template meta for sorting and display
     fetch(`/api/v1/ppt/template-management/summary`, {
       headers: getHeader(),
     })
@@ -54,7 +53,6 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
 
     const Templates: Template[] = templates
       .filter((templateID: string) => {
-        // Filter out template that contain any errored layouts (from custom templates compile/parse errors)
         const fullData = getFullDataByTemplateID(templateID);
         const hasErroredLayouts = fullData.some((fd: any) => (fd as any)?.component?.displayName === "CustomTemplateErrorSlide");
         return !hasErroredLayouts;
@@ -66,13 +64,12 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
         return {
           id: templateID,
           name: isCustom && customMeta?.name ? customMeta.name : templateID,
-          description: (isCustom && customMeta?.description) ? customMeta.description : (settings?.description || `${templateID} presentation templates`),
+          description: (isCustom && customMeta?.description) ? customMeta.description : (settings?.description || `${templateID} шаблон презентации`),
           ordered: settings?.ordered || false,
           default: settings?.default || false,
         };
       });
 
-    // Sort templates to put default first, then by name
     return Templates.sort((a, b) => {
       if (a.default && !b.default) return -1;
       if (!a.default && b.default) return 1;
@@ -86,11 +83,9 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
   );
   const customTemplates = React.useMemo(() => {
     const unsorted = templates.filter(g => g.id.toLowerCase().startsWith("custom-"));
-    // Sort by last_updated_at desc using summaryMap keyed by template id
     return unsorted.sort((a, b) => (summaryMap[b.id]?.lastUpdatedAt || 0) - (summaryMap[a.id]?.lastUpdatedAt || 0));
   }, [templates, summaryMap]);
 
-  // Auto-select first template when templates are loaded
   useEffect(() => {
     if (templates.length > 0 && !selectedTemplate) {
       const defaultTemplate = templates.find(g => g.default) || templates[0];
@@ -102,6 +97,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
       });
     }
   }, [templates, selectedTemplate, onSelectTemplate]);
+
   useEffect(() => {
     if (loading) {
       return;
@@ -115,9 +111,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
       script.async = true;
       document.head.appendChild(script);
     }
-
   }, []);
-
 
   if (loading) {
     return (
@@ -144,10 +138,10 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
       <div className="space-y-6">
         <div className="text-center py-8">
           <h5 className="text-lg font-medium mb-2 text-gray-700">
-            No Templates Available
+            Шаблоны недоступны
           </h5>
           <p className="text-gray-600 text-sm">
-            No presentation templates could be loaded. Please try refreshing the page.
+            Не удалось загрузить шаблоны презентаций. Попробуйте обновить страницу.
           </p>
         </div>
       </div>
@@ -164,9 +158,9 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
 
   return (
     <div className="space-y-8 mb-4">
-      {/* In Built Templates */}
+      {/* Встроенные шаблоны */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">In Built Templates</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Встроенные шаблоны</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {inBuiltTemplates.map((template) => (
             <TemplateLayouts
@@ -179,10 +173,10 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
         </div>
       </div>
 
-      {/* Custom AI Templates */}
+      {/* Пользовательские шаблоны ИИ */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">Custom AI Templates</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Пользовательские шаблоны ИИ</h3>
         </div>
         {customTemplates.length === 0 ? (
           <div className="text-sm text-gray-600 py-2">
@@ -205,4 +199,4 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
   );
 };
 
-export default TemplateSelection; 
+export default TemplateSelection;

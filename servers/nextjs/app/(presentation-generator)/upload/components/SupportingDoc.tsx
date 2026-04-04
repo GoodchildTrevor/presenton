@@ -18,7 +18,6 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
     const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    // Генерация ID для файлов
     const filesWithIds: FileWithId[] = files.map(file => {
         const fileWithId = file as FileWithId
         fileWithId.id = `${file.name || 'unnamed'}-${file.lastModified || Date.now()}-${file.size || 0}`
@@ -56,8 +55,8 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
 
         const invalidFiles = droppedFiles.filter(file => !validTypes.includes(file.type));
         if (invalidFiles.length > 0) {
-            toast.error('Invalid file type', {
-                description: 'Please upload only PDF, TXT, PPTX, or DOCX files',
+            toast.error('Неподдерживаемый формат файла', {
+                description: 'Загружайте только файлы PDF, TXT, PPTX или DOCX',
             });
             return;
         }
@@ -177,7 +176,7 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                                         className="bg-white rounded-lg border border-gray-200 overflow-hidden
                                         hover:border-purple-200 group relative"
                                     >
-                                        <div className="p-4 bg-purple-50 group-hover:bg-purple-100 
+                                        <div className="p-4 bg-purple-50 group-hover:bg-purple-100
                                             transition-colors flex items-center justify-center relative"
                                         >
                                             <File className="w-8 h-8 text-purple-600" />
@@ -188,27 +187,25 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                                                 }}
                                                 className="absolute top-1 right-2 p-1.5
                                                     bg-white/80 backdrop-blur-sm rounded-full
-                                                    text-gray-500 hover:text-red-500 
+                                                    text-gray-500 hover:text-red-500
                                                     shadow-sm hover:shadow-md
                                                     transition-all duration-200"
-                                                        aria-label="Remove file"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
-                                                </div>
+                                                aria-label="Удалить файл"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
 
-                                                <div className="p-3 relative">
-                                                    <p className="text-sm font-medium text-gray-700 truncate mb-1 pr-2">
-                                                        {file.name || 'Unnamed File'}
-                                                    </p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {formatFileSize(file.size)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )
-                                    )
-                                })}
+                                        <div className="p-3 relative">
+                                            <p className="text-sm font-medium text-gray-700 truncate mb-1 pr-2">
+                                                {file.name || 'Без названия'}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {formatFileSize(file.size)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
