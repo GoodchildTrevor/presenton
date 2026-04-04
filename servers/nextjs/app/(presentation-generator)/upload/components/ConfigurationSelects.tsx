@@ -5,7 +5,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {  LanguageType, PresentationConfig, ToneType, VerbosityType } from "../type";
+import {
+  LanguageType,
+  LanguageTypeLabels,
+  PresentationConfig,
+  ToneType,
+  ToneTypeLabels,
+  VerbosityType,
+  VerbosityTypeLabels,
+} from "../type";
 import { useState } from "react";
 import { Check, ChevronsUpDown, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,7 +62,6 @@ const SlideCountSelect: React.FC<{
   const sanitizeToPositiveInteger = (raw: string): string => {
     const digitsOnly = raw.replace(/\D+/g, "");
     if (!digitsOnly) return "";
-    // Remove leading zeros
     const noLeadingZeros = digitsOnly.replace(/^0+/, "");
     return noLeadingZeros;
   };
@@ -77,7 +84,7 @@ const SlideCountSelect: React.FC<{
       <SelectContent className="font-instrument_sans">
         {/* Sticky custom input at the top */}
         <div
-          className="sticky top-0 z-10 bg-white  p-2 border-b"
+          className="sticky top-0 z-10 bg-white p-2 border-b"
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
@@ -150,7 +157,7 @@ const LanguageSelect: React.FC<{
         className="w-[200px] justify-between font-instrument_sans font-semibold overflow-hidden bg-blue-100 hover:bg-blue-100 border-blue-200 focus-visible:ring-blue-300 border-none"
       >
         <p className="text-sm font-medium truncate">
-          {value || "Выберите язык"}
+          {value ? LanguageTypeLabels[value as LanguageType] : "Выберите язык"}
         </p>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
@@ -162,15 +169,15 @@ const LanguageSelect: React.FC<{
           className="font-instrument_sans"
         />
         <CommandList>
-          <CommandEmpty>Язык не был выбран.</CommandEmpty>
+          <CommandEmpty>Язык не найден.</CommandEmpty>
           <CommandGroup>
             {Object.values(LanguageType).map((language) => (
               <CommandItem
                 key={language}
-                value={language}
+                value={LanguageTypeLabels[language]}
                 role="option"
-                onSelect={(currentValue) => {
-                  onValueChange(currentValue);
+                onSelect={() => {
+                  onValueChange(language);
                   onOpenChange(false);
                 }}
                 className="font-instrument_sans"
@@ -181,7 +188,7 @@ const LanguageSelect: React.FC<{
                     value === language ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {language}
+                {LanguageTypeLabels[language]}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -244,17 +251,16 @@ export function ConfigurationSelects({
         onOpenChange={setOpenLanguage}
       />
       <ToolTip content="Расширенные настройки">
-
-      <button
-        aria-label="Расширенные настройки"
-        title="Расширенные настройки"
-        type="button"
-        onClick={() => handleOpenAdvancedChange(true)}
-        className="ml-auto flex items-center gap-2 text-sm underline underline-offset-4  bg-blue-100 hover:bg-blue-100 border-blue-200 focus-visible:ring-blue-300 border-none p-2 rounded-md font-instrument_sans font-medium"
-      >
-        <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-      </button>
-        </ToolTip>
+        <button
+          aria-label="Расширенные настройки"
+          title="Расширенные настройки"
+          type="button"
+          onClick={() => handleOpenAdvancedChange(true)}
+          className="ml-auto flex items-center gap-2 text-sm underline underline-offset-4 bg-blue-100 hover:bg-blue-100 border-blue-200 focus-visible:ring-blue-300 border-none p-2 rounded-md font-instrument_sans font-medium"
+        >
+          <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </ToolTip>
 
       <Dialog open={openAdvanced} onOpenChange={handleOpenAdvancedChange}>
         <DialogContent className="max-w-2xl font-instrument_sans">
@@ -271,13 +277,13 @@ export function ConfigurationSelects({
                 value={advancedDraft.tone}
                 onValueChange={(value) => setAdvancedDraft((prev) => ({ ...prev, tone: value as ToneType }))}
               >
-                <SelectTrigger className="w-full font-instrument_sans capitalize font-medium bg-blue-100 border-blue-200 focus-visible:ring-blue-300">
+                <SelectTrigger className="w-full font-instrument_sans font-medium bg-blue-100 border-blue-200 focus-visible:ring-blue-300">
                   <SelectValue placeholder="Выберите тон" />
                 </SelectTrigger>
                 <SelectContent className="font-instrument_sans">
                   {Object.values(ToneType).map((tone) => (
-                    <SelectItem key={tone} value={tone} className="text-sm font-medium capitalize">
-                      {tone}
+                    <SelectItem key={tone} value={tone} className="text-sm font-medium">
+                      {ToneTypeLabels[tone]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -292,20 +298,18 @@ export function ConfigurationSelects({
                 value={advancedDraft.verbosity}
                 onValueChange={(value) => setAdvancedDraft((prev) => ({ ...prev, verbosity: value as VerbosityType }))}
               >
-                <SelectTrigger className="w-full font-instrument_sans capitalize font-medium bg-blue-100 border-blue-200 focus-visible:ring-blue-300">
+                <SelectTrigger className="w-full font-instrument_sans font-medium bg-blue-100 border-blue-200 focus-visible:ring-blue-300">
                   <SelectValue placeholder="Выберите уровень детализации" />
                 </SelectTrigger>
                 <SelectContent className="font-instrument_sans">
                   {Object.values(VerbosityType).map((verbosity) => (
-                    <SelectItem key={verbosity} value={verbosity} className="text-sm font-medium capitalize">
-                      {verbosity}
+                    <SelectItem key={verbosity} value={verbosity} className="text-sm font-medium">
+                      {VerbosityTypeLabels[verbosity]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
-           
 
             {/* Toggles */}
             <div className="w-full flex flex-col gap-2 p-3 rounded-md bg-blue-100 border-blue-200">
@@ -330,7 +334,7 @@ export function ConfigurationSelects({
             </div>
             <div className="w-full flex flex-col gap-2 p-3 rounded-md bg-blue-100 border-blue-200">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-gray-700">Web поиск</label>
+                <label className="text-sm font-semibold text-gray-700">Веб-поиск</label>
                 <Switch
                   checked={advancedDraft.webSearch}
                   onCheckedChange={(checked) => setAdvancedDraft((prev) => ({ ...prev, webSearch: checked }))}
