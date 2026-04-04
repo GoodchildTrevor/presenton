@@ -6,7 +6,6 @@ import {
   Loader2,
   Redo2,
   Undo2,
-
 } from "lucide-react";
 import React, { useState } from "react";
 import Wrapper from "@/components/Wrapper";
@@ -19,13 +18,9 @@ import {
 import { PresentationGenerationApi } from "../../services/api/presentation-generation";
 import { OverlayLoader } from "@/components/ui/overlay-loader";
 import { useDispatch, useSelector } from "react-redux";
-
 import Link from "next/link";
-
 import { RootState } from "@/store/store";
 import { toast } from "sonner";
-
-
 import Announcement from "@/components/Announcement";
 import { PptxPresentationModel } from "@/types/pptx_models";
 import HeaderNav from "../../components/HeaderNab";
@@ -51,7 +46,6 @@ const Header = ({
   const pathname = usePathname();
   const dispatch = useDispatch();
 
-
   const { presentationData, isStreaming } = useSelector(
     (state: RootState) => state.presentationGeneration
   );
@@ -66,32 +60,28 @@ const Header = ({
 
   const handleExportPptx = async () => {
     if (isStreaming) return;
-
     try {
       setOpen(false);
       setShowLoader(true);
-      // Save the presentation data before exporting
       trackEvent(MixpanelEvent.Header_UpdatePresentationContent_API_Call);
       await PresentationGenerationApi.updatePresentationContent(presentationData);
       trackEvent(MixpanelEvent.Header_GetPptxModel_API_Call);
       const pptx_model = await get_presentation_pptx_model(presentation_id);
       if (!pptx_model) {
-        throw new Error("Failed to get presentation PPTX model");
+        throw new Error("Не удалось получить модель PPTX");
       }
       trackEvent(MixpanelEvent.Header_ExportAsPPTX_API_Call);
       const pptx_path = await PresentationGenerationApi.exportAsPPTX(pptx_model);
       if (pptx_path) {
-        // window.open(pptx_path, '_self');
         downloadLink(pptx_path);
       } else {
-        throw new Error("No path returned from export");
+        throw new Error("Путь к файлу не получен");
       }
     } catch (error) {
       console.error("Export failed:", error);
       setShowLoader(false);
-      toast.error("Having trouble exporting!", {
-        description:
-          "We are having trouble exporting your presentation. Please try again.",
+      toast.error("Ошибка экспорта!", {
+        description: "Не удалось экспортировать презентацию. Пожалуйста, попробуйте ещё раз.",
       });
     } finally {
       setShowLoader(false);
@@ -100,14 +90,11 @@ const Header = ({
 
   const handleExportPdf = async () => {
     if (isStreaming) return;
-
     try {
       setOpen(false);
       setShowLoader(true);
-      // Save the presentation data before exporting
       trackEvent(MixpanelEvent.Header_UpdatePresentationContent_API_Call);
       await PresentationGenerationApi.updatePresentationContent(presentationData);
-
       trackEvent(MixpanelEvent.Header_ExportAsPDF_API_Call);
       const response = await fetch('/api/export-as-pdf', {
         method: 'POST',
@@ -116,33 +103,30 @@ const Header = ({
           title: presentationData?.title,
         })
       });
-
       if (response.ok) {
         const { path: pdfPath } = await response.json();
-        // window.open(pdfPath, '_blank');
         downloadLink(pdfPath);
       } else {
-        throw new Error("Failed to export PDF");
+        throw new Error("Не удалось экспортировать PDF");
       }
-
     } catch (err) {
       console.error(err);
-      toast.error("Having trouble exporting!", {
-        description:
-          "We are having trouble exporting your presentation. Please try again.",
+      toast.error("Ошибка экспорта!", {
+        description: "Не удалось экспортировать презентацию. Пожалуйста, попробуйте ещё раз.",
       });
     } finally {
       setShowLoader(false);
     }
   };
+
   const handleReGenerate = () => {
     dispatch(clearPresentationData());
-    dispatch(clearHistory())
+    dispatch(clearHistory());
     trackEvent(MixpanelEvent.Header_ReGenerate_Button_Clicked, { pathname });
     router.push(`/presentation?id=${presentation_id}&stream=true`);
   };
+
   const downloadLink = (path: string) => {
-    // if we have popup access give direct download if not redirect to the path
     if (window.opener) {
       window.open(path, '_blank');
     } else {
@@ -162,9 +146,9 @@ const Header = ({
           handleExportPdf();
         }}
         variant="ghost"
-        className={`pb-4 border-b rounded-none border-gray-300 w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6 border-none rounded-lg" : ""}`} >
-        <Image src={PDFIMAGE} alt="pdf export" width={30} height={30} />
-        Export as PDF
+        className={`pb-4 border-b rounded-none border-gray-300 w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6 border-none rounded-lg" : ""}`}>
+        <Image src={PDFIMAGE} alt="Экспорт PDF" width={30} height={30} />
+        Экспорт в PDF
       </Button>
       <Button
         onClick={() => {
@@ -174,44 +158,30 @@ const Header = ({
         variant="ghost"
         className={`w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6" : ""}`}
       >
-        <Image src={PPTXIMAGE} alt="pptx export" width={30} height={30} />
-        Export as PPTX
+        <Image src={PPTXIMAGE} alt="Экспорт PPTX" width={30} height={30} />
+        Экспорт в PPTX
       </Button>
-
-
     </div>
   );
 
   const MenuItems = ({ mobile }: { mobile: boolean }) => (
     <div className="flex flex-col lg:flex-row items-center gap-4">
-      {/* undo redo */}
-      <button onClick={handleReGenerate} disabled={isStreaming || !presentationData} className="text-white  disabled:opacity-50" >
-
-        Re-Generate
+      <button onClick={handleReGenerate} disabled={isStreaming || !presentationData} className="text-white disabled:opacity-50">
+        Перегенерировать
       </button>
-      <div className="flex items-center gap-2 ">
-        <ToolTip content="Undo">
-          <button disabled={!canUndo} className="text-white disabled:opacity-50" onClick={() => {
-            onUndo();
-          }}>
-
-            <Undo2 className="w-6 h-6 " />
-
+      <div className="flex items-center gap-2">
+        <ToolTip content="Отменить">
+          <button disabled={!canUndo} className="text-white disabled:opacity-50" onClick={() => { onUndo(); }}>
+            <Undo2 className="w-6 h-6" />
           </button>
         </ToolTip>
-        <ToolTip content="Redo">
-
-          <button disabled={!canRedo} className="text-white disabled:opacity-50" onClick={() => {
-            onRedo();
-          }}>
-            <Redo2 className="w-6 h-6 " />
-
+        <ToolTip content="Повторить">
+          <button disabled={!canRedo} className="text-white disabled:opacity-50" onClick={() => { onRedo(); }}>
+            <Redo2 className="w-6 h-6" />
           </button>
         </ToolTip>
-
       </div>
 
-      {/* Present Button */}
       <Button
         onClick={() => {
           const to = `?id=${presentation_id}&mode=present&slide=${currentSlide || 0}`;
@@ -222,28 +192,23 @@ const Header = ({
         className="border border-white font-bold text-white rounded-[32px] transition-all duration-300 group"
       >
         <Play className="w-4 h-4 mr-1 stroke-white group-hover:stroke-black" />
-        Present
+        Показать
       </Button>
 
-      {/* Desktop Export Button with Popover */}
-
-      <div style={{
-        zIndex: 100
-      }} className="hidden lg:block relative ">
-        <Popover open={open} onOpenChange={setOpen} >
+      <div style={{ zIndex: 100 }} className="hidden lg:block relative">
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button className={`border py-5 text-[#5146E5] font-bold rounded-[32px] transition-all duration-500 hover:border hover:bg-[#5146E5] hover:text-white w-full ${mobile ? "" : "bg-white"}`}>
               <SquareArrowOutUpRight className="w-4 h-4 mr-1" />
-              Export
+              Экспорт
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-[250px] space-y-2 py-3 px-2 ">
+          <PopoverContent align="end" className="w-[250px] space-y-2 py-3 px-2">
             <ExportOptions mobile={false} />
           </PopoverContent>
         </Popover>
       </div>
 
-      {/* Mobile Export Section */}
       <div className="lg:hidden flex flex-col w-full">
         <ExportOptions mobile={true} />
       </div>
@@ -254,42 +219,27 @@ const Header = ({
     <>
       <OverlayLoader
         show={showLoader}
-        text="Exporting presentation..."
+        text="Экспортируем презентацию..."
         showProgress={true}
         duration={40}
       />
-      <div
-
-        className="bg-[#5146E5] w-full shadow-lg sticky top-0 ">
-
+      <div className="bg-[#5146E5] w-full shadow-lg sticky top-0">
         <Announcement />
         <Wrapper className="flex items-center justify-between py-1">
           <Link href="/dashboard" className="min-w-[162px]">
-            <img
-              className="h-16"
-              src="/logo-white.png"
-              alt="Presentation logo"
-            />
+            <img className="h-16" src="/logo-white.png" alt="Логотип презентаций" />
           </Link>
-
-          {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-4 2xl:gap-6">
             {isStreaming && (
               <Loader2 className="animate-spin text-white font-bold w-6 h-6" />
             )}
-
-
             <MenuItems mobile={false} />
             <HeaderNav />
           </div>
-
-          {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-4">
             <HeaderNav />
-
           </div>
         </Wrapper>
-
       </div>
     </>
   );

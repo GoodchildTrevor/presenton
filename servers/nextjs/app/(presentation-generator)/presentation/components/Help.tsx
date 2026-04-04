@@ -10,89 +10,87 @@ import React, { useState, useEffect, useRef } from "react";
 const helpQuestions = [
   {
     id: 1,
-    category: "Images",
-    question: "How do I change an image?",
+    category: "Изображения",
+    question: "Как изменить изображение?",
     answer:
-      "Click on any image to reveal the image toolbar. You'll see options to Edit, Adjust position, and change how the image fits within its container. The Edit option allows you to replace or modify the current image.",
+      "Нажмите на любое изображение, чтобы открыть панель инструментов. Вы увидите варианты: Редактировать, Настроить положение и изменить способ вписывания изображения. Опция Редактировать позволяет заменить или изменить текущее изображение.",
   },
   {
     id: 2,
-    category: "Images",
-    question: "Can I generate new images with AI?",
+    category: "Изображения",
+    question: "Можно ли создать изображение с помощью ИИ?",
     answer:
-      "Yes! Click on any image and select the Edit option from the toolbar. In the side panel that appears, you'll find the AI Generate tab. Enter your prompt describing the image you want, and our AI will generate an image based on your description.",
+      "Да! Нажмите на любое изображение и выберите Редактировать в панели инструментов. В открывшейся боковой панели перейдите на вкладку Генерация ИИ. Введите описание нужного изображения, и ИИ создаст его по вашему запросу.",
   },
   {
     id: 3,
-    category: "Images",
-    question: "How do I upload my own images?",
+    category: "Изображения",
+    question: "Как загрузить своё изображение?",
     answer:
-      "Click on any image, then select Edit from the toolbar. In the side panel, click on the Upload tab at the top. You can browse your files to select one. Once uploaded, you can apply it to your design.",
+      "Нажмите на изображение, затем выберите Редактировать. В боковой панели нажмите вкладку Загрузить. Выберите файл на вашем устройстве. После загрузки его можно применить к дизайну.",
   },
   {
     id: 11,
-    category: "AI Prompts",
-    question: "Can I change slide layout through prompt?",
+    category: "ИИ-запросы",
+    question: "Можно ли изменить макет слайда через запрос?",
     answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe your layout requirements and the AI will change the slide layout accordingly.",
+      "Да! Нажмите на иконку WandSparkles в левом верхнем углу слайда — появится поле для ввода запроса. Опишите требуемый макет, и ИИ изменит слайд соответственно.",
   },
   {
     id: 12,
-    category: "AI Prompts",
-    question: "Can I change slide image through prompt?",
+    category: "ИИ-запросы",
+    question: "Можно ли изменить изображение слайда через запрос?",
     answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe the image you want and the AI will update the slide image based on your requirements.",
+      "Да! Нажмите на иконку WandSparkles в левом верхнем углу слайда — появится поле для ввода. Опишите желаемое изображение, и ИИ обновит его согласно описанию.",
   },
-
   {
     id: 14,
-    category: "AI Prompts",
-    question: "Can I change content through prompt?",
+    category: "ИИ-запросы",
+    question: "Можно ли изменить содержимое слайда через запрос?",
     answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe what content you want and the AI will update the slide's text and content based on your description.",
+      "Да! Нажмите на иконку WandSparkles в левом верхнем углу слайда и введите описание нужного содержимого. ИИ обновит текст и контент слайда по вашему описанию.",
   },
   {
     id: 4,
-    category: "Text",
-    question: "How can I format and highlight text?",
+    category: "Текст",
+    question: "Как форматировать и выделять текст?",
     answer:
-      "Select any text to see the formatting toolbar appear. You'll have options for Bold, Italic, Underline, Strikethrough,and more.",
+      "Выделите любой текст — появится панель форматирования. Доступны: Жирный, Курсив, Подчёркивание, Зачёркивание и другие опции.",
   },
   {
     id: 5,
-    category: "Icons",
-    question: "How do I change icons?",
+    category: "Иконки",
+    question: "Как изменить иконку?",
     answer:
-      "Click on any existing icon to modify it. In the icon selector panel, you can browse icos or use the search function to find specific icons. We offer thousands of icons in various styles.",
+      "Нажмите на любую иконку для её изменения. В панели выбора иконок можно просматривать коллекцию или использовать поиск. Доступны тысячи иконок в разных стилях.",
   },
   {
     id: 16,
-    category: "Layout",
-    question: "Can I change the position of slide?",
+    category: "Макет",
+    question: "Можно ли изменить порядок слайдов?",
     answer:
-      "Of course, On side panel you can drag the slide and place wherever you want.",
+      "Конечно! В боковой панели можно перетаскивать слайды и размещать их в нужном порядке.",
   },
   {
     id: 15,
-    category: "Layout",
-    question: "Can I add new slide between the slide?",
+    category: "Макет",
+    question: "Можно ли добавить новый слайд между существующими?",
     answer:
-      "Yes you can just click on the plus icon below each slide.It will display the all the layouts and choose required one.",
+      "Да! Нажмите на иконку плюса под нужным слайдом — отобразятся все доступные макеты, выберите подходящий.",
   },
   {
     id: 6,
-    category: "Layout",
-    question: "Can I add more sections to my slides?",
+    category: "Макет",
+    question: "Можно ли добавить секции на слайд?",
     answer:
-      "Absolutely! Hover near the bottom of any text box or content block, and you'll see a + icon appear. Click this button to add a new section below the current one. You can also use the Insert menu to add specific section types.",
+      "Конечно! Наведите курсор ниже любого текстового блока — появится иконка +. Нажмите, чтобы добавить секцию ниже. Также можно использовать меню Вставка для добавления конкретных типов секций.",
   },
-
   {
     id: 8,
-    category: "Export",
-    question: "How do I download or export my presentation?",
+    category: "Экспорт",
+    question: "Как скачать или экспортировать презентацию?",
     answer:
-      "Click the Export button in the top right menu. You can choose to download as PDF, PowerPoint.",
+      "Нажмите кнопку Экспорт в правом верхнем меню. Доступны форматы: PDF и PowerPoint.",
   },
 ];
 
@@ -101,40 +99,28 @@ const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredQuestions, setFilteredQuestions] = useState(helpQuestions);
   const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("Все");
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Extract unique categories and create "All" category list
   useEffect(() => {
-    const uniqueCategories = Array.from(
-      new Set(helpQuestions.map((q) => q.category))
-    );
-    setCategories(["All", ...uniqueCategories]);
+    const uniqueCategories = Array.from(new Set(helpQuestions.map((q) => q.category)));
+    setCategories(["Все", ...uniqueCategories]);
   }, []);
 
-  // Filter questions based on search query and selected category
   useEffect(() => {
     let results = helpQuestions;
-
-    // Filter by category if not "All"
-    if (selectedCategory !== "All") {
+    if (selectedCategory !== "Все") {
       results = results.filter((q) => q.category === selectedCategory);
     }
-
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       results = results.filter(
-        (q) =>
-          q.question.toLowerCase().includes(query) ||
-          q.answer.toLowerCase().includes(query)
+        (q) => q.question.toLowerCase().includes(query) || q.answer.toLowerCase().includes(query)
       );
     }
-
     setFilteredQuestions(results);
   }, [searchQuery, selectedCategory]);
 
-  // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (
@@ -145,63 +131,39 @@ const Help = () => {
         setIsOpen(false);
       }
     };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const handleOpenClose = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // Animation helpers
-  const modalClass = isOpen
-    ? "opacity-100 scale-100"
-    : "opacity-0 scale-95 pointer-events-none";
+  const modalClass = isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none";
 
   return (
     <>
-      {/* Help Button */}
       <button
-        onClick={handleOpenClose}
+        onClick={() => setIsOpen(!isOpen)}
         className="help-button hidden fixed bottom-6 right-6 h-12 w-12 z-50 bg-emerald-600 hover:bg-emerald-700 rounded-full md:flex justify-center items-center cursor-pointer shadow-lg transition-all duration-300 hover:shadow-xl"
-        aria-label="Help Center"
+        aria-label="Центр помощи"
       >
-        {isOpen ? (
-          <X className="text-white h-5 w-5" />
-        ) : (
-          <HelpCircle className="text-white h-5 w-5" />
-        )}
+        {isOpen ? <X className="text-white h-5 w-5" /> : <HelpCircle className="text-white h-5 w-5" />}
       </button>
 
-      {/* Help Modal */}
       <div
         className={`fixed bottom-20 right-6 z-50 max-w-md w-full transition-all duration-300 transform ${modalClass}`}
         ref={modalRef}
       >
         <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
-          {/* Header */}
           <div className="bg-emerald-600 text-white px-6 py-4 flex justify-between items-center">
-            <h2 className="text-lg font-medium">Help Center</h2>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="hover:bg-emerald-700 p-1 rounded"
-            >
+            <h2 className="text-lg font-medium">Центр помощи</h2>
+            <button onClick={() => setIsOpen(false)} className="hover:bg-emerald-700 p-1 rounded">
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Search */}
           <div className="px-6 pt-4 pb-2">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search help topics..."
+                placeholder="Поиск по темам..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
@@ -210,40 +172,31 @@ const Help = () => {
             </div>
           </div>
 
-          {/* Category Pills */}
           <div className="px-6 pb-3 flex gap-2 overflow-x-auto hide-scrollbar">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${selectedCategory === category
+                className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
+                  selectedCategory === category
                     ? "bg-emerald-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                }`}
               >
                 {category}
               </button>
             ))}
           </div>
 
-          {/* FAQ Accordion */}
           <div className="max-h-96 overflow-y-auto px-6 pb-6">
             {filteredQuestions.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
                 {filteredQuestions.map((faq, index) => (
-                  <AccordionItem
-                    key={index}
-                    value={`item-${index}`}
-                    className="border-b border-gray-200 last:border-b-0"
-                  >
+                  <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3 px-1 text-left flex">
                       <div className="flex-1 pr-2">
-                        <span className="text-gray-900 font-medium text-sm md:text-base">
-                          {faq.question}
-                        </span>
-                        <span className="block text-xs text-emerald-600 mt-0.5">
-                          {faq.category}
-                        </span>
+                        <span className="text-gray-900 font-medium text-sm md:text-base">{faq.question}</span>
+                        <span className="block text-xs text-emerald-600 mt-0.5">{faq.category}</span>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="px-1 pb-3">
@@ -256,55 +209,23 @@ const Help = () => {
               </Accordion>
             ) : (
               <div className="py-8 text-center text-gray-500">
-                <p>No results found for "{searchQuery}"</p>
+                <p>Ничего не найдено по запросу "{searchQuery}"</p>
                 <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("All");
-                  }}
+                  onClick={() => { setSearchQuery(""); setSelectedCategory("Все"); }}
                   className="mt-2 text-emerald-600 hover:underline text-sm"
                 >
-                  Clear search
+                  Сбросить поиск
                 </button>
               </div>
             )}
           </div>
 
-          {/* Footer */}
           <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-            Still need help?{" "}
-            <a href="/contact" className="text-emerald-600 hover:underline">
-              Contact Support
-            </a>
+            Остались вопросы?{" "}
+            <a href="/contact" className="text-emerald-600 hover:underline">Написать в поддержку</a>
           </div>
         </div>
       </div>
-
-      {/* Custom AccordionTrigger implementation (since shadcn's might not be available) */}
-      {!AccordionTrigger && (
-        <style jsx>{`
-          .accordion-trigger {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            text-align: left;
-            transition: all 0.2s;
-          }
-          .accordion-trigger:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-          }
-          .accordion-content {
-            overflow: hidden;
-            height: 0;
-            transition: height 0.2s ease;
-          }
-          .accordion-content[data-state="open"] {
-            height: auto;
-          }
-        `}</style>
-      )}
     </>
   );
 };
