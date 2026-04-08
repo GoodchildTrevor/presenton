@@ -1,5 +1,7 @@
 import dirtyjson
 import json
+import re
+import logging
 from typing import AsyncGenerator, List, Optional
 from fastapi import HTTPException
 from openai import AsyncOpenAI
@@ -34,6 +36,42 @@ from utils.schema_utils import (
     flatten_json_schema,
     remove_titles_from_schema,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _extract_json_from_content(content: str) -> dict | None:
+    """Strip markdown formatting and extract a JSON object from LLM response."""
+    if not content or not content.strip():
+        return None
+
+    # Strip markdown code fences: ```json ... ``` or ``` ... ```
+    cleaned = re.sub(r"```(?:json)?\s*", "", content)
+    cleaned = cleaned.replace("```", "")
+
+    # Strip bold/italic markdown markers
+    cleaned = re.sub(r"\*+", "", cleaned).strip()
+
+    if not cleaned:
+        return None
+
+    # Try dirtyjson on cleaned content first
+    try:
+        return dict(dirtyjson.loads(cleaned))
+    except Exception:
+        pass
+
+    # Fallback: find first JSON object via regex
+    match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+    if match:
+        try:
+            return dict(dirtyjson.loads(match.group()))
+        except Exception:
+            pass
+
+    logger.warning("Could not extract JSON from LLM content: %r", content[:200])
+    return None
+
 
 class LLMClient:
     def __init__(self):
@@ -258,7 +296,7 @@ class LLMClient:
                 )
         if content:
             if depth == 0:
-                return dict(dirtyjson.loads(content))
+                return _extract_json_from_content(content)
             return content
         return None
 
