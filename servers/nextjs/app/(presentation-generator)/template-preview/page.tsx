@@ -100,7 +100,7 @@ const LayoutPreview = () => {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Все шаблоны</h1>
             <p className="text-gray-600 mt-2">
-              {layoutTemplates.length} templates
+              {layoutTemplates.length} шаблонов
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ const LayoutPreview = () => {
         <section className="h-full pt-8 pb-8 flex justify-center items-center">
           <div className="max-w-7xl mx-auto px-6 py-6 w-full">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Custom AI Templates</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Собственные шаблоны</h2>
               <button className="text-sm text-gray-800 hover:text-blue-600 transition-colors flex items-center gap-2 group" onClick={() => {
                 trackEvent(MixpanelEvent.Navigation, { from: pathname, to: `/custom-template` });
                 router.push(`/custom-template`)
