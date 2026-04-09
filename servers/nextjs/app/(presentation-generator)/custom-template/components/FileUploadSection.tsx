@@ -106,7 +106,7 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             {isProcessingPptx
               ? "Extracting Slides..."
               : !selectedFile
-              ? "Select a PDF or PPTX file"
+              ? "Выберете PDF или PPTX файл"
               : "Process File"}
           </Button>
           {isProcessingPptx && <Timer duration={90} />}
