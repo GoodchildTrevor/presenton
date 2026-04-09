@@ -1,6 +1,8 @@
 .git
 .gitignore
 
+.env
+
 servers/fastapi/tmp
 servers/fastapi/debug
 servers/fastapi/.venv
