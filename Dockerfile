@@ -39,11 +39,8 @@ RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
 # Pre-download ChromaDB ONNX embedding model so it's baked into the image
 # and never downloaded at container startup
 RUN python3 -c "\
-import os; \
-os.makedirs('chroma/models', exist_ok=True); \
-from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2; \
-ef = ONNXMiniLM_L6_V2(); \
-ef.DOWNLOAD_PATH = 'chroma/models'; \
+from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLmL6V2; \
+ef = ONNXMiniLmL6V2(); \
 ef._download_model_if_not_exists(); \
 print('ChromaDB ONNX model cached successfully.')"
 
