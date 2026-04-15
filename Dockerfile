@@ -36,32 +36,6 @@ RUN pip install /tmp/torchvision-0.25.0+cpu-cp311-cp311-manylinux_2_28_x86_64.wh
 RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu \
     --timeout 600
 
-# Pre-download ChromaDB ONNX embedding model so it's baked into the image
-# and never downloaded at container startup
-RUN python3 -c "\
-from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLmL6V2; \
-ef = ONNXMiniLmL6V2(); \
-ef._download_model_if_not_exists(); \
-print('ChromaDB ONNX model cached successfully.')"
-
-# Pre-download docling ML models (layout, table, etc.) so first PDF/DOCX
-# conversion does not trigger a HuggingFace fetch at runtime
-RUN python3 -c "\
-from docling.document_converter import DocumentConverter, PdfFormatOption, PowerpointFormatOption, WordFormatOption; \
-from docling.datamodel.pipeline_options import PdfPipelineOptions; \
-from docling.datamodel.base_models import InputFormat; \
-opts = PdfPipelineOptions(); \
-opts.do_ocr = False; \
-DocumentConverter( \
-    allowed_formats=[InputFormat.PDF, InputFormat.PPTX, InputFormat.DOCX], \
-    format_options={ \
-        InputFormat.PDF: PdfFormatOption(pipeline_options=opts), \
-        InputFormat.PPTX: PowerpointFormatOption(pipeline_options=opts), \
-        InputFormat.DOCX: WordFormatOption(pipeline_options=opts), \
-    } \
-); \
-print('Docling models cached successfully.')"
-
 # Install dependencies for Next.js
 WORKDIR /app/servers/nextjs
 COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
