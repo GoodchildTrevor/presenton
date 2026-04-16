@@ -5,12 +5,12 @@ from typing import Optional, List, Dict
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form, Depends
 from pydantic import BaseModel
-from openai import OpenAI
-from openai import APIError
+from openai import OpenAI, AsyncOpenAI, APIError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
 from utils.asset_directory_utils import get_images_directory
 from services.database import get_async_session
+from utils.get_env import get_llm_provider_env, get_ollama_url_env, get_ollama_model_env
 from models.sql.presentation_layout_code import PresentationLayoutCodeModel
 from .prompts import (
     GENERATE_HTML_SYSTEM_PROMPT,
@@ -18,6 +18,39 @@ from .prompts import (
     HTML_EDIT_SYSTEM_PROMPT,
 )
 from models.sql.template import TemplateModel
+
+
+def _extract_message_content(resp) -> str:
+    """
+    Robustly extract textual content from various chat/completions response shapes.
+    Handles objects with attributes or dicts, nested message.content as str or list.
+    """
+    try:
+        choices = getattr(resp, "choices", None) or (resp.get("choices") if isinstance(resp, dict) else None)
+        if choices:
+            first = choices[0]
+            message = getattr(first, "message", None) or (first.get("message") if isinstance(first, dict) else None)
+            if message:
+                content = getattr(message, "content", None) or (message.get("content") if isinstance(message, dict) else None)
+                if isinstance(content, str):
+                    return content
+                if isinstance(content, list):
+                    parts = []
+                    for item in content:
+                        if isinstance(item, dict):
+                            t = item.get("text") or item.get("content")
+                            if t:
+                                parts.append(t)
+                        elif isinstance(item, str):
+                            parts.append(item)
+                    return "\n".join(parts)
+        out = ""
+        out = getattr(resp, "output_text", None) or getattr(resp, "text", None) or out
+        if not out and isinstance(resp, dict):
+            out = resp.get("output_text") or resp.get("text") or out
+        return out or ""
+    except Exception:
+        return ""
 
 
 # Create separate routers for each functionality
@@ -154,7 +187,15 @@ async def generate_html_from_slide(
         f"Generating HTML from slide image and XML using OpenAI GPT-5 Responses API..."
     )
     try:
-        client = OpenAI(api_key=api_key)
+        base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+        if not api_key and (
+            (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama")
+            or os.getenv("OLLAMA_URL")
+            or os.getenv("VISION_MODEL")
+        ):
+            client = AsyncOpenAI(base_url=base, api_key="ollama")
+        else:
+            client = AsyncOpenAI(api_key=api_key)
 
         # Compose input for Responses API. Include system prompt, image (separate), OXML and optional fonts text.
         data_url = f"data:{media_type};base64,{base64_image}"
@@ -176,27 +217,47 @@ async def generate_html_from_slide(
         ]
 
         print("Making Responses API request for HTML generation...")
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "high"},
-            text={"verbosity": "low"},
-        )
-
-        # Extract the response text
-        html_content = (
-            getattr(response, "output_text", None)
-            or getattr(response, "text", None)
-            or ""
-        )
-
+        # Prefer vision-capable chat completions when using Ollama or when VISION_MODEL is set.
+        vision_model = os.getenv("VISION_MODEL") or get_ollama_model_env()
+        if (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama") and vision_model:
+            # Use Ollama-compatible chat completions with image + text payload
+            base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+            ollama_client = AsyncOpenAI(base_url=base, api_key="ollama")
+            response = await ollama_client.chat.completions.create(
+                model=vision_model,
+                messages=[
+                    {"role": "system", "content": GENERATE_HTML_SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": data_url}},
+                            {"type": "text", "text": user_text},
+                        ],
+                    },
+                ],
+            )
+            html_content = _extract_message_content(response)
+        else:
+            response = await client.responses.create(
+                model="gpt-5",
+                input=input_payload,
+                reasoning={"effort": "high"},
+                text={"verbosity": "low"},
+            )
+            # Extract the response text
+            html_content = (
+                getattr(response, "output_text", None)
+                or getattr(response, "text", None)
+                or ""
+            )
+ 
         print(f"Received HTML content length: {len(html_content)}")
-
+ 
         if not html_content:
             raise HTTPException(
                 status_code=500, detail="No HTML content generated by OpenAI GPT-5"
             )
-
+ 
         return html_content
 
     except APIError as e:
@@ -246,7 +307,15 @@ async def generate_react_component_from_html(
         HTTPException: If API call fails or no content is generated
     """
     try:
-        client = OpenAI(api_key=api_key)
+        base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+        if not api_key and (
+            (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama")
+            or os.getenv("OLLAMA_URL")
+            or os.getenv("VISION_MODEL")
+        ):
+            client = AsyncOpenAI(base_url=base, api_key="ollama")
+        else:
+            client = AsyncOpenAI(api_key=api_key)
 
         print("Making Responses API request for React component generation...")
 
@@ -261,21 +330,35 @@ async def generate_react_component_from_html(
             {"role": "user", "content": content_parts},
         ]
 
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "minimal"},
-            text={"verbosity": "low"},
-        )
-
-        react_content = (
-            getattr(response, "output_text", None)
-            or getattr(response, "text", None)
-            or ""
-        )
-
+        # Prefer vision-capable chat completions when using Ollama or when VISION_MODEL is set.
+        vision_model = os.getenv("VISION_MODEL") or get_ollama_model_env()
+        if (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama") and vision_model:
+            base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+            ollama_client = AsyncOpenAI(base_url=base, api_key="ollama")
+            response = await ollama_client.chat.completions.create(
+                model=vision_model,
+                messages=[
+                    {"role": "system", "content": HTML_TO_REACT_SYSTEM_PROMPT},
+                    {"role": "user", "content": content_parts},
+                ],
+            )
+            react_content = _extract_message_content(response)
+        else:
+            response = await client.responses.create(
+                model="gpt-5",
+                input=input_payload,
+                reasoning={"effort": "minimal"},
+                text={"verbosity": "low"},
+            )
+ 
+            react_content = (
+                getattr(response, "output_text", None)
+                or getattr(response, "text", None)
+                or ""
+            )
+ 
         print(f"Received React content length: {len(react_content)}")
-
+ 
         if not react_content:
             raise HTTPException(
                 status_code=500, detail="No React component generated by OpenAI GPT-5"
@@ -356,7 +439,15 @@ async def edit_html_with_images(
         HTTPException: If API call fails or no content is generated
     """
     try:
-        client = OpenAI(api_key=api_key)
+        base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+        if not api_key and (
+            (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama")
+            or os.getenv("OLLAMA_URL")
+            or os.getenv("VISION_MODEL")
+        ):
+            client = AsyncOpenAI(base_url=base, api_key="ollama")
+        else:
+            client = AsyncOpenAI(api_key=api_key)
 
         print("Making Responses API request for HTML editing...")
 
@@ -383,19 +474,33 @@ async def edit_html_with_images(
             {"role": "user", "content": content_parts},
         ]
 
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "low"},
-            text={"verbosity": "low"},
-        )
-
-        edited_html = (
-            getattr(response, "output_text", None)
-            or getattr(response, "text", None)
-            or ""
-        )
-
+        # Prefer vision-capable chat completions when using Ollama or when VISION_MODEL is set.
+        vision_model = os.getenv("VISION_MODEL") or get_ollama_model_env()
+        if (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama") and vision_model:
+            base = (get_ollama_url_env() or "http://localhost:11434") + "/v1"
+            ollama_client = AsyncOpenAI(base_url=base, api_key="ollama")
+            response = await ollama_client.chat.completions.create(
+                model=vision_model,
+                messages=[
+                    {"role": "system", "content": HTML_EDIT_SYSTEM_PROMPT},
+                    {"role": "user", "content": content_parts},
+                ],
+            )
+            edited_html = _extract_message_content(response)
+        else:
+            response = await client.responses.create(
+                model="gpt-5",
+                input=input_payload,
+                reasoning={"effort": "low"},
+                text={"verbosity": "low"},
+            )
+ 
+            edited_html = (
+                getattr(response, "output_text", None)
+                or getattr(response, "text", None)
+                or ""
+            )
+ 
         print(f"Received edited HTML content length: {len(edited_html)}")
 
         if not edited_html:
@@ -448,7 +553,8 @@ async def convert_slide_to_html(request: SlideToHtmlRequest):
     try:
         # Get OpenAI API key from environment
         api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
+        # Allow missing OPENAI_API_KEY when using a local Ollama provider
+        if not api_key and not (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama"):
             raise HTTPException(
                 status_code=500, detail="OPENAI_API_KEY environment variable not set"
             )
@@ -533,7 +639,8 @@ async def convert_html_to_react(request: HtmlToReactRequest):
     try:
         # Get OpenAI API key from environment
         api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
+        # Allow missing OPENAI_API_KEY when using a local Ollama provider
+        if not api_key and not (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama"):
             raise HTTPException(
                 status_code=500, detail="OPENAI_API_KEY environment variable not set"
             )
@@ -623,7 +730,8 @@ async def edit_html_with_images_endpoint(
     try:
         # Get OpenAI API key from environment
         api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
+        # Allow missing OPENAI_API_KEY when using a local Ollama provider
+        if not api_key and not (get_llm_provider_env() and get_llm_provider_env().lower() == "ollama"):
             raise HTTPException(
                 status_code=500, detail="OPENAI_API_KEY environment variable not set"
             )
