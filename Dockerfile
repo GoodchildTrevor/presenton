@@ -27,6 +27,11 @@ RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
 
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 
+# Pre-download Chroma ONNX model to avoid runtime download in container
+RUN mkdir -p /app/servers/fastapi/chroma/models && \
+    curl -L "https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz" \
+    -o /app/servers/fastapi/chroma/models/onnx.tar.gz
+
 COPY vendor/torchvision-0.25.0+cpu-cp311-cp311-manylinux_2_28_x86_64.whl /tmp/
 
 # Установить torchvision из файла (без сети)

@@ -16,7 +16,11 @@ class IconFinderService:
         print("Icons collection initialized.")
 
     def _initialize_icons_collection(self):
+        import os
+        # Указываем путь ДО создания объекта — через env, который chromadb читает сам
+        os.environ.setdefault("CHROMA_ONNX_MODELS_PATH", "chroma/models")
         self.embedding_function = ONNXMiniLM_L6_V2()
+        # DOWNLOAD_PATH теперь не нужен отдельно, но оставим для надёжности
         self.embedding_function.DOWNLOAD_PATH = "chroma/models"
         self.embedding_function._download_model_if_not_exists()
         try:
