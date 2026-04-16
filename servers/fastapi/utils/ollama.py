@@ -1,6 +1,7 @@
 import json
 from typing import AsyncGenerator
 import aiohttp
+import os
 from fastapi import HTTPException
 
 from models.ollama_model_status import OllamaModelStatus
@@ -38,6 +39,14 @@ async def list_pulled_ollama_models() -> list[OllamaModelStatus]:
         ) as response:
             if response.status == 200:
                 pulled_models = await response.json()
+                
+                allowed_raw = os.environ.get("MODELS_FOR_USERS", "")
+                allowed = [m.strip() for m in allowed_raw.split(",") if m.strip()]
+                
+                models = pulled_models["models"]
+                if allowed:
+                    models = [m for m in models if m["model"] in allowed]
+                
                 return [
                     OllamaModelStatus(
                         name=m["model"],
@@ -46,7 +55,7 @@ async def list_pulled_ollama_models() -> list[OllamaModelStatus]:
                         downloaded=m["size"],
                         done=True,
                     )
-                    for m in pulled_models["models"]
+                    for m in models
                 ]
             elif response.status == 403:
                 raise HTTPException(
