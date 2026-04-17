@@ -25,7 +25,6 @@ export const ThemeTypeLabels: Record<ThemeType, string> = {
 };
 
 export enum LanguageType {
-  // Major world languages
   Russian = "Russian",
   English = "English",
   Spanish = "Spanish",
