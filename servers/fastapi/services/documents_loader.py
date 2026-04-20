@@ -2,11 +2,11 @@ import mimetypes
 import os
 import asyncio
 import aiofiles
-from typing import List, Optional, Tuple
+from typing import Optional
 import aiohttp
 from fastapi import HTTPException
-import requests  # для синхронных вызовов
 
+from utils.get_env import get_file_worker_env
 from constants.documents import (
     PDF_MIME_TYPES,
     POWERPOINT_TYPES,
@@ -14,149 +14,170 @@ from constants.documents import (
     WORD_TYPES,
 )
 
+NON_TEXT_MIME_TYPES = PDF_MIME_TYPES | POWERPOINT_TYPES | WORD_TYPES
+
 
 class DocumentsLoader:
+    """
+    Asynchronous document loader supporting multiple file formats.
 
-    def __init__(self, file_paths: List[str]):
+    This class handles loading text content from various document types
+    using either direct file reading for text files or an external file_worker
+    API for complex document formats.
+
+    :ivar _file_paths: List of file paths to process
+    :ivar _documents: List of extracted text content for each file
+    :ivar filework_api_url: URL endpoint for the external file processing service
+    """
+
+    def __init__(self, file_paths: list[str]):
+        """
+        Initialize the document loader with file paths.
+
+        :param file_paths: List of file system paths to documents
+        """
         self._file_paths = file_paths
-        self._documents: List[str] = []
-        self._images: List[List[str]] = []
-        self.filework_api_url = "http://localhost:8055/filework"  # или "http://file_worker:8055/filework" для Docker
+        self._documents: list[str] = []
+        self.filework_api_url = get_file_worker_env() or "http://file_worker:8055/filework"
 
     @property
-    def documents(self):
+    def documents(self) -> list[str]:
+        """
+        Get extracted document texts.
+
+        :return: List of text content extracted from each file, maintaining original order
+        """
         return self._documents
 
     @property
-    def images(self):
+    def images(self) -> list[list[str]]:
+        """
+        Get extracted images from documents.
+
+        .. note::
+            Currently returns empty lists as image extraction is not implemented.
+
+        :return: List of lists containing image references for each document
+        """
         return self._images
 
     async def load_documents(
         self,
-        temp_dir: Optional[str] = None,
         load_text: bool = True,
-        load_images: bool = False,
-    ):
-        """If load_images is True, temp_dir must be provided"""
+    ) -> None:
+        """
+        Load and extract text from all documents asynchronously.
 
-        if load_images and not temp_dir:
-            raise ValueError("temp_dir must be provided when load_images is True")
+        Processes all files in parallel using asyncio.gather. Text files are read
+        directly, while other formats are sent to the file_worker API.
 
-        documents: List[str] = []
-        images: List[List[str]] = []
+        :param load_text: Whether to extract text content, defaults to True
+        :return: None, results are stored in the `documents` property
+        .. note::
+            Failed files are marked with error messages in the output.
+        """
+        if not self._file_paths:
+            self._documents = []
+            self._images = []
+            return
 
-        for file_path in self._file_paths:
-            if not os.path.exists(file_path):
-                raise HTTPException(
-                    status_code=404, detail=f"File {file_path} not found"
-                )
+        tasks = [
+            self._process_single_file(file_path, load_text)
+            for file_path in self._file_paths
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
-            document = ""
-            imgs = []
+        self._documents = []
+        self._images = []
+        for result in results:
+            if isinstance(result, Exception):
+                self._documents.append(f"[System Error: {str(result)}]")
+            else:
+                self._documents.append(result if result else "")
+            self._images.append([])
 
-            mime_type = mimetypes.guess_type(file_path)[0]
-            
-            if mime_type is None:
-                # Пробуем определить по расширению
-                mime_type = self._guess_mime_by_extension(file_path)
-            
-            try:
-                if mime_type in PDF_MIME_TYPES:
-                    document, imgs = await self.load_pdf(
-                        file_path, load_text, load_images, temp_dir
-                    )
-                elif mime_type in TEXT_MIME_TYPES:
-                    document = await self.load_text(file_path)
-                elif mime_type in POWERPOINT_TYPES:
-                    document = await self.load_powerpoint(file_path)
-                elif mime_type in WORD_TYPES:
-                    document = await self.load_msword(file_path)
-                else:
-                    # Для неподдерживаемых форматов пробуем через API
-                    document = await self._call_filework_api(file_path)
-            except Exception as e:
-                document = f"[Ошибка обработки файла {os.path.basename(file_path)}: {str(e)}]"
-
-            documents.append(document)
-            images.append(imgs)
-
-        self._documents = documents
-        self._images = images
-
-    async def load_pdf(
+    async def _process_single_file(
         self,
         file_path: str,
         load_text: bool,
-        load_images: bool,
-        temp_dir: Optional[str] = None,
-    ) -> Tuple[str, List[str]]:
-        image_paths = []
-        document: str = ""
+    ) -> str:
+        """
+        Process a single file and extract its text content.
 
-        if load_text:
-            try:
-                document = await self._call_filework_api(file_path)
-            except Exception as e:
-                document = f"[Ошибка API для PDF: {str(e)}]"
+        :param file_path: Path to the file to process
+        :param load_text: Whether to extract text content
+        :return: Extracted text content or error message
+        """
+        if not os.path.exists(file_path):
+            return f"[Ошибка: файл {file_path} не найден]"
 
-        if load_images and temp_dir:
-            try:
-                image_paths = await self.get_page_images_from_pdf_async(file_path, temp_dir)
-            except Exception as e:
-                image_paths = [f"[Ошибка извлечения изображений: {str(e)}]"]
+        mime_type = mimetypes.guess_type(file_path)[0]
+        if mime_type is None:
+            mime_type = self._guess_mime_by_extension(file_path)
 
-        return document, image_paths
+        try:
+            if mime_type in TEXT_MIME_TYPES:
+                return await self.load_text(file_path)
+            else:
+                return await self._call_filework_api(file_path)
+        except Exception as e:
+            return f"[Ошибка обработки файла {os.path.basename(file_path)}: {str(e)}]"
 
     async def load_text(self, file_path: str) -> str:
-        """Чтение текстовых файлов напрямую"""
+        """
+        Read text files directly.
+
+        Attempts to read with UTF-8 encoding first, then falls back to other
+        common encodings if decoding fails.
+
+        :param file_path: Path to the text file
+        :return: File content or error message
+        :raises UnicodeDecodeError: Handled internally with fallback encodings
+        :raises OSError: Handled internally and returns error message
+        """
         try:
             async with aiofiles.open(file_path, "r", encoding="utf-8") as file:
                 return await file.read()
         except UnicodeDecodeError:
-            # Пробуем другие кодировки
-            for encoding in ["cp1251", "iso-8859-1", "koi8-r"]:
+            encodings = ["cp1251", "iso-8859-1", "koi8-r", "utf-16"]
+            for encoding in encodings:
                 try:
                     async with aiofiles.open(file_path, "r", encoding=encoding) as file:
                         return await file.read()
-                except:
+                except (UnicodeDecodeError, UnicodeError):
                     continue
             return f"[Ошибка декодирования файла: {file_path}]"
-        except Exception as e:
+        except OSError as e:
             return f"[Ошибка чтения файла: {str(e)}]"
 
-    async def load_msword(self, file_path: str) -> str:
-        """Загрузка Word документов через API"""
-        return await self._call_filework_api(file_path)
-
-    async def load_powerpoint(self, file_path: str) -> str:
-        """Загрузка PowerPoint через API"""
-        return await self._call_filework_api(file_path)
-
     async def _call_filework_api(self, file_path: str) -> str:
-        """Call the external filework API to extract text from the file"""
+        """
+        Send file to file_worker API and retrieve extracted text.
+
+        :param file_path: Path to the file to process
+        :type file_path: str
+        :return: Extracted text from the file
+        :raises HTTPException: If API request fails or returns error status
+        """
         try:
-            # Вариант 1: Используем aiohttp с правильным multipart
+            async with aiofiles.open(file_path, 'rb') as f:
+                file_content = await f.read()
+
             data = aiohttp.FormData()
-            data.add_field(
-                'file',
-                open(file_path, 'rb'),
-                filename=os.path.basename(file_path),
-                content_type='application/octet-stream'
-            )
-            
+            data.add_field('file', file_content,
+                           filename=os.path.basename(file_path),
+                           content_type='application/octet-stream')
+
             timeout = aiohttp.ClientTimeout(total=60)
             async with aiohttp.ClientSession(timeout=timeout) as session:
-                async with session.post(
-                    self.filework_api_url,
-                    data=data
-                ) as response:
-                    if response.status == 200:
-                        return await response.text()
+                async with session.post(self.filework_api_url, data=data) as resp:
+                    if resp.status == 200:
+                        return await resp.text()
                     else:
-                        error_text = await response.text()
+                        error_text = await resp.text()
                         raise HTTPException(
-                            status_code=response.status,
-                            detail=f"Filework API error ({response.status}): {error_text}"
+                            status_code=resp.status,
+                            detail=f"Filework API error ({resp.status}): {error_text}"
                         )
         except aiohttp.ClientError as e:
             raise HTTPException(
@@ -169,33 +190,14 @@ class DocumentsLoader:
                 detail=f"Error calling filework API: {str(e)}"
             )
 
-    def _call_filework_api_sync(self, file_path: str) -> str:
-        """Синхронная версия для использования в синхронном контексте"""
-        try:
-            with open(file_path, 'rb') as f:
-                response = requests.post(
-                    self.filework_api_url,
-                    files={'file': f},
-                    timeout=60
-                )
-                
-                if response.status_code == 200:
-                    return response.text
-                else:
-                    raise HTTPException(
-                        status_code=response.status_code,
-                        detail=f"Filework API error: {response.text}"
-                    )
-        except requests.exceptions.RequestException as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Connection error: {str(e)}"
-            )
-
     def _guess_mime_by_extension(self, file_path: str) -> Optional[str]:
-        """Определение MIME типа по расширению если mimetypes не справился"""
+        """
+        Guess MIME type based on file extension when mimetypes fails.
+
+        :param file_path: Path to the file
+        :return: Detected MIME type or None if unknown
+        """
         ext = os.path.splitext(file_path)[1].lower()
-        
         mime_map = {
             '.pdf': 'application/pdf',
             '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -207,46 +209,24 @@ class DocumentsLoader:
             '.json': 'application/json',
             '.xml': 'application/xml',
             '.csv': 'text/csv',
+            '.rtf': 'application/rtf',
+            '.odt': 'application/vnd.oasis.opendocument.text',
         }
-        
         return mime_map.get(ext)
 
     @classmethod
-    def get_page_images_from_pdf(cls, file_path: str, temp_dir: str) -> List[str]:
-        """Синхронное извлечение изображений из PDF"""
-        try:
-            import pdfplumber
-            from pathlib import Path
-            
-            # Создаем директорию если нет
-            Path(temp_dir).mkdir(parents=True, exist_ok=True)
-            
-            images = []
-            with pdfplumber.open(file_path) as pdf:
-                for page_num, page in enumerate(pdf.pages, 1):
-                    try:
-                        img = page.to_image(resolution=150)
-                        image_path = os.path.join(temp_dir, f"page_{page_num}.png")
-                        img.save(image_path)
-                        images.append(image_path)
-                    except Exception as e:
-                        images.append(f"[Ошибка страницы {page_num}: {str(e)}]")
-            return images
-        except ImportError:
-            return ["[Требуется установка pdfplumber]"]
-        except Exception as e:
-            return [f"[Ошибка извлечения изображений: {str(e)}]"]
+    async def from_files(cls, file_paths: list[str], **kwargs):
+        """
+        Factory method to create and load documents in one step.
 
-    @classmethod
-    async def get_page_images_from_pdf_async(cls, file_path: str, temp_dir: str):
-        """Асинхронная обертка для извлечения изображений"""
-        return await asyncio.to_thread(
-            cls.get_page_images_from_pdf, file_path, temp_dir
-        )
+        :param file_paths: List of file paths to process
+        :param kwargs: Additional arguments passed to load_documents()
+        :return: Configured and loaded DocumentsLoader instance.
 
-    @classmethod
-    async def from_files(cls, file_paths: List[str], **kwargs):
-        """Фабричный метод для удобства"""
+        Example:
+            >>> loader = await DocumentsLoader.from_files(["doc.pdf", "doc.txt"])
+            >>> print(loader.documents)
+        """
         loader = cls(file_paths)
         await loader.load_documents(**kwargs)
         return loader
