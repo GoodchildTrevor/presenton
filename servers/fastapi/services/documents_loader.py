@@ -38,6 +38,7 @@ class DocumentsLoader:
         """
         self._file_paths = file_paths
         self._documents: list[str] = []
+        self._images: list[list[str]] = []
         self.filework_api_url = get_file_worker_env() or "http://file_worker:8055/filework"
 
     @property
@@ -91,7 +92,7 @@ class DocumentsLoader:
         self._images = []
         for result in results:
             if isinstance(result, Exception):
-                self._documents.append(f"[System Error: {str(result)}]")
+                raise result
             else:
                 self._documents.append(result if result else "")
             self._images.append([])
@@ -107,21 +108,21 @@ class DocumentsLoader:
         :param file_path: Path to the file to process
         :param load_text: Whether to extract text content
         :return: Extracted text content or error message
+        :raises HTTPException: If the file is not found or an upstream service is unavailable
         """
         if not os.path.exists(file_path):
-            return f"[Ошибка: файл {file_path} не найден]"
+            raise HTTPException(
+                status_code=404, detail=f"File {file_path} not found"
+            )
 
         mime_type = mimetypes.guess_type(file_path)[0]
         if mime_type is None:
             mime_type = self._guess_mime_by_extension(file_path)
 
-        try:
-            if mime_type in TEXT_MIME_TYPES:
-                return await self.load_text(file_path)
-            else:
-                return await self._call_filework_api(file_path)
-        except Exception as e:
-            return f"[Ошибка обработки файла {os.path.basename(file_path)}: {str(e)}]"
+        if mime_type in TEXT_MIME_TYPES:
+            return await self.load_text(file_path)
+        else:
+            return await self._call_filework_api(file_path)
 
     async def load_text(self, file_path: str) -> str:
         """
@@ -157,37 +158,47 @@ class DocumentsLoader:
         :param file_path: Path to the file to process
         :type file_path: str
         :return: Extracted text from the file
-        :raises HTTPException: If API request fails or returns error status
+        :raises HTTPException: If the service is unavailable, the request times out,
+            or the API returns a non-200 status
         """
         try:
             async with aiofiles.open(file_path, 'rb') as f:
                 file_content = await f.read()
 
             data = aiohttp.FormData()
-            data.add_field('file', file_content,
-                           filename=os.path.basename(file_path),
-                           content_type='application/octet-stream')
+            data.add_field(
+                'file',
+                file_content,
+                filename=os.path.basename(file_path),
+                content_type='application/octet-stream',
+            )
 
             timeout = aiohttp.ClientTimeout(total=60)
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.post(self.filework_api_url, data=data) as resp:
                     if resp.status == 200:
                         return await resp.text()
-                    else:
-                        error_text = await resp.text()
-                        raise HTTPException(
-                            status_code=resp.status,
-                            detail=f"Filework API error ({resp.status}): {error_text}"
-                        )
+                    error_text = await resp.text()
+                    raise HTTPException(
+                        status_code=resp.status,
+                        detail=f"Filework API error ({resp.status}): {error_text}",
+                    )
+        except HTTPException:
+            raise
+        except aiohttp.ClientConnectorError as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"File worker service is unavailable: {str(e)}",
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=503,
+                detail="File worker service timed out",
+            )
         except aiohttp.ClientError as e:
             raise HTTPException(
-                status_code=500,
-                detail=f"Connection error to filework API: {str(e)}"
-            )
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error calling filework API: {str(e)}"
+                status_code=503,
+                detail=f"Connection error to file worker service: {str(e)}",
             )
 
     def _guess_mime_by_extension(self, file_path: str) -> Optional[str]:
@@ -230,4 +241,3 @@ class DocumentsLoader:
         loader = cls(file_paths)
         await loader.load_documents(**kwargs)
         return loader
-    
