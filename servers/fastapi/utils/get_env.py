@@ -43,5 +43,8 @@ def get_extended_reasoning_env():
 def get_web_grounding_env():
     return os.getenv("WEB_GROUNDING")
 
+def get_file_worker_env():
+    return os.getenv("FILE_WORKER_URL")
+
 def get_flux_url_env() -> Optional[str]:
     return os.getenv("FLUX_URL")
