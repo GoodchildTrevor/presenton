@@ -5,7 +5,6 @@ import logging
 import math
 import os
 import random
-import traceback
 from typing import Annotated, List, Literal, Optional, Tuple
 import dirtyjson
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Path
@@ -84,6 +83,27 @@ MSG_COMPLETED = "Генерация презентации завершена"
 MSG_FAILED = "Ошибка генерации презентации"
 MSG_QUEUED = "В очереди на генерацию"
 
+# ---------------------------------------------------------------------------
+# HTTP error messages (русский)
+# ---------------------------------------------------------------------------
+ERR_PRESENTATION_NOT_FOUND = "Презентация не найдена"
+ERR_OUTLINES_REQUIRED = "Структура слайдов не может быть пустой"
+ERR_PRESENTATION_NOT_PREPARED = "Презентация не подготовлена для стриминга"
+ERR_OUTLINES_EMPTY = "Структура слайдов не может быть пустой"
+ERR_TOC_MIN_SLIDES = "Количество слайдов не может быть меньше 3, если включено оглавление"
+ERR_NO_CONTENT = "Необходимо указать контент, markdown слайдов или файлы для генерации презентации"
+ERR_SLIDES_GT_ZERO = "Количество слайдов должно быть больше нуля"
+ERR_TEMPLATE_NOT_FOUND = "Шаблон не найден. Пожалуйста, используйте корректный шаблон."
+ERR_TASK_NOT_FOUND = "Задача генерации презентации не найдена"
+ERR_GENERATION_FAILED = "Ошибка генерации презентации"
+ERR_FAILED_TO_GENERATE_OUTLINES = "Не удалось сгенерировать структуру презентации. Попробуйте ещё раз."
+
+# ---------------------------------------------------------------------------
+# TOC template strings (LLM prompt content — keep as constants, not hardcoded)
+# ---------------------------------------------------------------------------
+TOC_HEADER = "Table of Contents\n\n"
+TOC_SLIDE_LINE_TEMPLATE = "Slide page number: {page_number}\n Slide Content: {content}\n\n"
+
 
 @PRESENTATION_ROUTER.get("/all", response_model=List[PresentationWithSlides])
 async def get_all_presentations(sql_session: AsyncSession = Depends(get_async_session)):
@@ -116,7 +136,7 @@ async def get_presentation(
 ):
     presentation = await sql_session.get(PresentationModel, id)
     if not presentation:
-        raise HTTPException(404, "Presentation not found")
+        raise HTTPException(404, ERR_PRESENTATION_NOT_FOUND)
     slides = await sql_session.scalars(
         select(SlideModel)
         .where(SlideModel.presentation == id)
@@ -134,7 +154,7 @@ async def delete_presentation(
 ):
     presentation = await sql_session.get(PresentationModel, id)
     if not presentation:
-        raise HTTPException(404, "Presentation not found")
+        raise HTTPException(404, ERR_PRESENTATION_NOT_FOUND)
 
     await sql_session.delete(presentation)
     await sql_session.commit()
@@ -158,7 +178,7 @@ async def create_presentation(
     if include_table_of_contents and n_slides < 3:
         raise HTTPException(
             status_code=400,
-            detail="Number of slides cannot be less than 3 if table of contents is included",
+            detail=ERR_TOC_MIN_SLIDES,
         )
 
     presentation_id = uuid.uuid4()
@@ -192,11 +212,11 @@ async def prepare_presentation(
     sql_session: AsyncSession = Depends(get_async_session),
 ):
     if not outlines:
-        raise HTTPException(status_code=400, detail="Outlines are required")
+        raise HTTPException(status_code=400, detail=ERR_OUTLINES_REQUIRED)
 
     presentation = await sql_session.get(PresentationModel, presentation_id)
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
 
     presentation_outline_model = PresentationOutlineModel(slides=outlines)
 
@@ -237,7 +257,7 @@ async def prepare_presentation(
                     i + 1 if presentation.include_title_slide else i,
                     toc_slide_layout_index,
                 )
-                toc_outline = "Table of Contents\n\n"
+                toc_outline = TOC_HEADER
 
                 for outline in presentation_outline_model.slides[
                     outline_index:outlines_to
@@ -247,7 +267,10 @@ async def prepare_presentation(
                         if presentation.include_title_slide
                         else outline_index - i + n_toc_slides
                     )
-                    toc_outline += f"Slide page number: {page_number}\n Slide Content: {outline.content[:100]}\n\n"
+                    toc_outline += TOC_SLIDE_LINE_TEMPLATE.format(
+                        page_number=page_number,
+                        content=outline.content[:100],
+                    )
                     outline_index += 1
 
                 outline_index += 1
@@ -275,16 +298,16 @@ async def stream_presentation(
 ):
     presentation = await sql_session.get(PresentationModel, id)
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
     if not presentation.structure:
         raise HTTPException(
             status_code=400,
-            detail="Presentation not prepared for stream",
+            detail=ERR_PRESENTATION_NOT_PREPARED,
         )
     if not presentation.outlines:
         raise HTTPException(
             status_code=400,
-            detail="Outlines can not be empty",
+            detail=ERR_OUTLINES_EMPTY,
         )
 
     image_generation_service = ImageGenerationService(get_images_directory())
@@ -385,7 +408,7 @@ async def update_presentation(
 ):
     presentation = await sql_session.get(PresentationModel, id)
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
 
     presentation_update_dict = {}
     if n_slides:
@@ -444,7 +467,7 @@ async def export_presentation_as_pptx_or_pdf(
     presentation = await sql_session.get(PresentationModel, id)
 
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
 
     presentation_and_path = await export_presentation(
         id,
@@ -469,14 +492,14 @@ async def check_if_api_request_is_valid(
     if not (request.content or request.slides_markdown or request.files):
         raise HTTPException(
             status_code=400,
-            detail="Either content or slides markdown or files is required to generate presentation",
+            detail=ERR_NO_CONTENT,
         )
 
     # Making sure number of slides is greater than 0
     if request.n_slides <= 0:
         raise HTTPException(
             status_code=400,
-            detail="Number of slides must be greater than 0",
+            detail=ERR_SLIDES_GT_ZERO,
         )
 
     # Checking if template is valid
@@ -485,7 +508,7 @@ async def check_if_api_request_is_valid(
         if not request.template.startswith("custom-"):
             raise HTTPException(
                 status_code=400,
-                detail="Template not found. Please use a valid template.",
+                detail=ERR_TEMPLATE_NOT_FOUND,
             )
         template_id = request.template.replace("custom-", "")
         try:
@@ -495,7 +518,7 @@ async def check_if_api_request_is_valid(
         except Exception:
             raise HTTPException(
                 status_code=400,
-                detail="Template not found. Please use a valid template.",
+                detail=ERR_TEMPLATE_NOT_FOUND,
             )
 
     return (presentation_id,)
@@ -569,10 +592,10 @@ async def generate_presentation_handler(
                     dirtyjson.loads(presentation_outlines_text)
                 )
             except Exception:
-                traceback.print_exc()
+                logger.exception("Не удалось распарсить JSON структуры презентации")
                 raise HTTPException(
                     status_code=400,
-                    detail="Failed to generate presentation outlines. Please try again.",
+                    detail=ERR_FAILED_TO_GENERATE_OUTLINES,
                 )
             presentation_outlines = PresentationOutlineModel(
                 **presentation_outlines_json
@@ -639,7 +662,7 @@ async def generate_presentation_handler(
                         i + 1 if request.include_title_slide else i,
                         toc_slide_layout_index,
                     )
-                    toc_outline = "Table of Contents\n\n"
+                    toc_outline = TOC_HEADER
 
                     for outline in presentation_outlines.slides[
                         outline_index:outlines_to
@@ -649,7 +672,10 @@ async def generate_presentation_handler(
                             if request.include_title_slide
                             else outline_index - i + n_toc_slides
                         )
-                        toc_outline += f"Slide page number: {page_number}\n Slide Content: {outline.content[:100]}\n\n"
+                        toc_outline += TOC_SLIDE_LINE_TEMPLATE.format(
+                            page_number=page_number,
+                            content=outline.content[:100],
+                        )
                         outline_index += 1
 
                     outline_index += 1
@@ -790,7 +816,7 @@ async def generate_presentation_handler(
     except Exception as e:
         if not isinstance(e, HTTPException):
             logger.exception("Необработанная ошибка при генерации презентации")
-            e = HTTPException(status_code=500, detail="Presentation generation failed")
+            e = HTTPException(status_code=500, detail=ERR_GENERATION_FAILED)
 
         api_error_model = APIErrorModel.from_exception(e)
 
@@ -826,7 +852,7 @@ async def generate_presentation_sync(
         )
     except Exception:
         logger.exception("Ошибка при синхронной генерации презентации")
-        raise HTTPException(status_code=500, detail="Presentation generation failed")
+        raise HTTPException(status_code=500, detail=ERR_GENERATION_FAILED)
 
 
 @PRESENTATION_ROUTER.post(
@@ -860,7 +886,7 @@ async def generate_presentation_async(
     except Exception as e:
         if not isinstance(e, HTTPException):
             logger.exception("Ошибка при постановке задачи генерации в очередь")
-            e = HTTPException(status_code=500, detail="Presentation generation failed")
+            e = HTTPException(status_code=500, detail=ERR_GENERATION_FAILED)
 
         raise e
 
@@ -875,7 +901,7 @@ async def check_async_presentation_generation_status(
     status = await sql_session.get(AsyncPresentationGenerationTaskModel, id)
     if not status:
         raise HTTPException(
-            status_code=404, detail="No presentation generation task found"
+            status_code=404, detail=ERR_TASK_NOT_FOUND
         )
     return status
 
@@ -887,7 +913,7 @@ async def edit_presentation_with_new_content(
 ):
     presentation = await sql_session.get(PresentationModel, data.presentation_id)
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
 
     slides = await sql_session.scalars(
         select(SlideModel).where(SlideModel.presentation == data.presentation_id)
@@ -931,7 +957,7 @@ async def derive_presentation_from_existing_one(
 ):
     presentation = await sql_session.get(PresentationModel, data.presentation_id)
     if not presentation:
-        raise HTTPException(status_code=404, detail="Presentation not found")
+        raise HTTPException(status_code=404, detail=ERR_PRESENTATION_NOT_FOUND)
 
     slides = await sql_session.scalars(
         select(SlideModel).where(SlideModel.presentation == data.presentation_id)

@@ -39,6 +39,8 @@ from utils.schema_utils import (
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_OLLAMA_URL = "http://localhost:11434"
+
 
 def _extract_json_from_content(content: str) -> dict | None:
     """Strip markdown formatting and extract a JSON object from LLM response."""
@@ -96,8 +98,15 @@ class LLMClient:
         return self._get_ollama_client()
 
     def _get_ollama_client(self):
+        ollama_url = get_ollama_url_env()
+        if not ollama_url:
+            logger.warning(
+                "OLLAMA_URL не задан в переменных окружения, используется fallback: %s",
+                DEFAULT_OLLAMA_URL,
+            )
+            ollama_url = DEFAULT_OLLAMA_URL
         return AsyncOpenAI(
-            base_url=(get_ollama_url_env() or "http://localhost:11434") + "/v1",
+            base_url=ollama_url + "/v1",
             api_key="ollama",
         )
 
