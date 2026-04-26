@@ -33,14 +33,14 @@ export const SaveLayoutModal: React.FC<SaveLayoutModalProps> = ({
 
   const handleSave = async () => {
     if (!layoutName.trim()) {
-      return; // Don't save if name is empty
+      return; // Не сохранять, если имя пустое
     }
     const id = await onSave(layoutName.trim(), description.trim());
     if (id) {
-      // Redirect to the new template preview page
+      // Перенаправление на страницу предварительного просмотра нового шаблона
       router.push(`/template-preview/custom-${id}`);
     }
-    // Reset form after navigation decision
+    // Сброс формы после принятия решения о навигации
     setLayoutName("");
     setDescription("");
   };
@@ -59,35 +59,35 @@ export const SaveLayoutModal: React.FC<SaveLayoutModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Save className="w-5 h-5 text-green-600" />
-            Save Template
+            Сохранить шаблон
           </DialogTitle>
           <DialogDescription>
-            Enter a name and description for your template. This will help you identify it later.
+            Введите название и описание для вашего шаблона. Это поможет вам найти его позже.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="layout-name" className="text-sm font-medium">
-              Template Name *
+              Название шаблона *
             </Label>
             <Input
               id="layout-name"
               value={layoutName}
               onChange={(e) => setLayoutName(e.target.value)}
-              placeholder="Enter template name..."
+              placeholder="Введите название шаблона..."
               disabled={isSaving}
               className="w-full"
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description" className="text-sm font-medium">
-              Description
+              Описание
             </Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter a description for your template..."
+              placeholder="Введите описание шаблона..."
               disabled={isSaving}
               className="w-full resize-none"
               rows={3}
@@ -100,7 +100,7 @@ export const SaveLayoutModal: React.FC<SaveLayoutModalProps> = ({
             onClick={handleClose}
             disabled={isSaving}
           >
-            Cancel
+            Отмена
           </Button>
           <Button
             onClick={handleSave}
@@ -110,12 +110,12 @@ export const SaveLayoutModal: React.FC<SaveLayoutModalProps> = ({
             {isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
+                Сохранение...
               </>
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                Save Template
+                Сохранить шаблон
               </>
             )}
           </Button>
@@ -123,4 +123,4 @@ export const SaveLayoutModal: React.FC<SaveLayoutModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};
