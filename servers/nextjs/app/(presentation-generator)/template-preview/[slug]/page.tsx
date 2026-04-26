@@ -64,7 +64,6 @@ const GroupLayoutPreview = () => {
           };
         }
         setLayoutsMap(map);
-        // Set template meta and inject aggregated fonts if provided
         if (data?.template) {
           setTemplateMeta({ name: data.template.name, description: data.template.description });
         }
@@ -90,7 +89,6 @@ const GroupLayoutPreview = () => {
     }
   }, [rawSlug]);
 
-  // Ensure fonts are injected if layoutsMap changes dynamically
   useEffect(() => {
     if (!isCustom) return;
     const allFonts: string[] = [];
@@ -100,15 +98,14 @@ const GroupLayoutPreview = () => {
     if (allFonts.length) useFontLoader(allFonts);
   }, [layoutsMap, isCustom]);
 
-  // Handle loading state
   if (loading) {
     return <LoadingStates type="loading" />;
   }
 
-  // Handle empty state
   if (!layoutGroup || layoutGroup.length === 0) {
     return <LoadingStates type="empty" />;
   }
+
   const deleteLayouts = async () => {
     refetch();
     router.back();
@@ -119,7 +116,7 @@ const GroupLayoutPreview = () => {
     if (response.ok) {
       router.push("/template-preview");
     }
-  }
+  };
 
   const openEditor = (layoutName: string) => {
     const entry = layoutsMap[layoutName];
@@ -128,13 +125,11 @@ const GroupLayoutPreview = () => {
     setCurrentLayoutId(entry.layout_id);
     setCurrentCode(entry.layout_code || "");
     setCurrentFonts(entry.fonts);
-    // Make sure fonts for this layout are loaded before editing
     useFontLoader(entry.fonts || []);
     setEditorOpen(true);
   };
 
   const handleCancel = () => {
-    // reset to original code
     const entry = layoutsMap[currentLayoutName];
     if (entry) setCurrentCode(entry.layout_code || "");
     setEditorOpen(false);
@@ -160,7 +155,6 @@ const GroupLayoutPreview = () => {
         body: JSON.stringify(payload),
       });
       if (!res.ok) return;
-      // update cache map
       setLayoutsMap((prev) => ({
         ...prev,
         [currentLayoutName]: {
@@ -179,10 +173,10 @@ const GroupLayoutPreview = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Шапка */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* Navigation */}
+          {/* Навигация */}
           <div className="flex items-center gap-4 mb-4">
             <Button
               variant="outline"
@@ -194,7 +188,7 @@ const GroupLayoutPreview = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              Назад
             </Button>
             <Button
               variant="outline"
@@ -208,26 +202,34 @@ const GroupLayoutPreview = () => {
               <Home className="w-4 h-4" />
               Все шаблоны
             </Button>
-            {isCustom && <button className=" border border-red-200 flex justify-center items-center gap-2 text-red-700 px-4 py-1 rounded-md" onClick={() => {
-              trackEvent(MixpanelEvent.TemplatePreview_Delete_Templates_Button_Clicked, { pathname });
-              trackEvent(MixpanelEvent.TemplatePreview_Delete_Templates_API_Call);
-              deleteLayouts();
-            }}><Trash2 className="w-4 h-4" />Delete</button>}
+            {isCustom && (
+              <button
+                className="border border-red-200 flex justify-center items-center gap-2 text-red-700 px-4 py-1 rounded-md"
+                onClick={() => {
+                  trackEvent(MixpanelEvent.TemplatePreview_Delete_Templates_Button_Clicked, { pathname });
+                  trackEvent(MixpanelEvent.TemplatePreview_Delete_Templates_API_Call);
+                  deleteLayouts();
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+                Удалить
+              </button>
+            )}
           </div>
 
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 capitalize">
-              {templateMeta?.name || layoutGroup[0].templateID} Layouts
+              {templateMeta?.name || layoutGroup[0].templateID} — макеты
             </h1>
             <p className="text-gray-600 mt-2">
-              {layoutGroup.length} layout{layoutGroup.length !== 1 ? "s" : ""} • {templateMeta?.description || layoutGroup[0].templateID}
+              {layoutGroup.length} {layoutGroup.length === 1 ? "макет" : layoutGroup.length < 5 ? "макета" : "макетов"} •{" "}
+              {templateMeta?.description || layoutGroup[0].templateID}
             </p>
           </div>
-
         </div>
       </header>
 
-      {/* Layout Grid */}
+      {/* Сетка макетов */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="space-y-8">
           {layoutGroup.map((layout: any, index: number) => {
@@ -243,7 +245,7 @@ const GroupLayoutPreview = () => {
                 key={`${layoutGroup[0].templateID}-${index}`}
                 className="overflow-hidden shadow-md hover:shadow-lg transition-shadow"
               >
-                {/* Layout Header */}
+                {/* Заголовок макета */}
                 <div className="bg-white px-6 py-4 border-b">
                   <div className="flex items-center justify-between">
                     <div>
@@ -261,7 +263,7 @@ const GroupLayoutPreview = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
-                        Layout #{index + 1}
+                        Макет #{index + 1}
                       </div>
                       {isCustom && (
                         <Button
@@ -273,16 +275,16 @@ const GroupLayoutPreview = () => {
                             openEditor(fileName);
                           }}
                           disabled={!layoutsMap[fileName]}
-                          title={!layoutsMap[fileName] ? "Loading layout code..." : "Edit layout code"}
+                          title={!layoutsMap[fileName] ? "Загрузка кода макета..." : "Редактировать код макета"}
                         >
-                          <Pencil className="w-4 h-4" /> Edit
+                          <Pencil className="w-4 h-4" /> Изменить
                         </Button>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Layout Content */}
+                {/* Содержимое макета */}
                 <div className="bg-gray-50 aspect-video max-w-[1280px] w-full">
                   <LayoutComponent data={sampleData} />
                 </div>
@@ -292,18 +294,18 @@ const GroupLayoutPreview = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Подвал */}
       <footer className="bg-white border-t mt-16">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="text-center text-gray-600">
             <p>
-              {layoutGroup[0].templateID} • {layoutGroup.length} components
+              {layoutGroup[0].templateID} • {layoutGroup.length} компонентов
             </p>
           </div>
         </div>
       </footer>
 
-      {/* Right-side Sheet Editor */}
+      {/* Редактор (боковая панель) */}
       {isCustom && (
         <Sheet open={editorOpen} onOpenChange={(open) => { if (!open) handleCancel(); }}>
           <SheetContent side="right" className="w-full sm:max-w-[860px] p-0">
@@ -311,7 +313,7 @@ const GroupLayoutPreview = () => {
               <SheetTitle className="flex items-center justify-between w-full">
                 <span className="flex items-center gap-2 text-purple-800">
                   <Code className="w-5 h-5 text-purple-600" />
-                  HTML Editor
+                  HTML-редактор
                 </span>
               </SheetTitle>
             </SheetHeader>
@@ -340,7 +342,7 @@ const GroupLayoutPreview = () => {
                     disabled={isSaving}
                   >
                     <X size={14} />
-                    Cancel
+                    Отмена
                   </Button>
                   <Button
                     onClick={handleSave}
@@ -349,7 +351,7 @@ const GroupLayoutPreview = () => {
                     disabled={isSaving}
                   >
                     <Save size={14} />
-                    Save HTML
+                    Сохранить HTML
                   </Button>
                 </div>
               </SheetTitle>
