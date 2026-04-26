@@ -14,7 +14,7 @@ from constants.documents import (
     WORD_TYPES,
 )
 
-NON_TEXT_MIME_TYPES = PDF_MIME_TYPES | POWERPOINT_TYPES | WORD_TYPES
+NON_TEXT_MIME_TYPES = PDF_MIME_TYPES + POWERPOINT_TYPES + WORD_TYPES
 
 
 class DocumentsLoader:
