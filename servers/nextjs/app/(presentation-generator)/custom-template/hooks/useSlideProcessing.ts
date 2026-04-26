@@ -118,7 +118,7 @@ export const useSlideProcessing = (
   // Process PDF or PPTX file to extract slides
   const processFile = useCallback(async () => {
     if (!selectedFile) {
-      toast.error("Пожалуйста, сначала выберете PDF или PPTX файл");
+      toast.error("Пожалуйста, сначала выберите PDF или PPTX файл");
       return;
     }
 
