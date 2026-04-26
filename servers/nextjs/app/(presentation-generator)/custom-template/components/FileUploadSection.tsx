@@ -39,14 +39,14 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           Загрузите PDF или PPTX файл
         </CardTitle>
         <CardDescription>
-          Выберете PDF или PowerPoint файл (.pdf or .pptx) для обработки. Максимальный размер файла: 100MB
+          Выберите PDF или PowerPoint файл (.pdf или .pptx) для обработки. Максимальный размер файла: 100MB
         </CardDescription>
         {slides.length > 0 && (
           <div className="flex items-center justify-end gap-2">
             {slides.some((s) => s.processing) && (
               <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             )}
-            {completedSlides}/{slides.length} слайдов обработано
+            Обработано слайдов: {completedSlides}/{slides.length}
           </div>
         )}
       </CardHeader>
@@ -61,13 +61,14 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               <input
                 id="file-upload"
                 type="file"
+                name="file-upload"
                 accept=".pdf,.pptx"
                 onChange={handleFileSelect}
                 className="opacity-0 w-full h-full cursor-pointer absolute top-0 left-0 z-10"
               />
             </Label>
             <p className="text-sm text-gray-500 mt-2">
-              Перетащите файл или кликните на кнопку ниже
+              Перетащите файл или кликните на область выше
             </p>
           </div>
         ) : (
@@ -79,7 +80,7 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                   {selectedFile.name}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                  {(selectedFile.size / (1024 * 1024)).toFixed(2)} МБ
                 </p>
               </div>
             </div>
@@ -97,21 +98,21 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           </div>
         )}
 
-        <div className="flex flex-col gap-1 ">
+        <div className="flex flex-col gap-1">
           <Button
             onClick={processFile}
             disabled={isProcessingPptx || slides.some((s) => s.processing)}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
           >
             {isProcessingPptx
-              ? "Extracting Slides..."
+              ? "Извлечение слайдов..."
               : !selectedFile
-              ? "Выберете PDF или PPTX файл"
-              : "Process File"}
+              ? "Выберите PDF или PPTX файл"
+              : "Обработать файл"}
           </Button>
           {isProcessingPptx && <Timer duration={90} />}
         </div>
       </CardContent>
     </Card>
   );
-}; 
+};
