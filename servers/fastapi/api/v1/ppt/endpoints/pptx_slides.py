@@ -286,6 +286,73 @@ async def analyze_fonts_in_all_slides(slide_xmls: List[str]) -> FontAnalysisResu
     )
 
 
+async def get_page_images_from_pdf_async(pdf_path: str, output_dir: str) -> List[str]:
+    """
+    Convert each page of a PDF to a PNG file using pdftoppm (poppler-utils).
+    Falls back to ImageMagick convert if pdftoppm is not available.
+
+    Args:
+        pdf_path: Path to the PDF file
+        output_dir: Directory where PNG files will be saved
+
+    Returns:
+        Sorted list of absolute paths to generated PNG files
+    """
+    loop = asyncio.get_event_loop()
+
+    def _convert() -> List[str]:
+        prefix = os.path.join(output_dir, "slide")
+        # Try pdftoppm first (poppler-utils — already present for LibreOffice environments)
+        try:
+            subprocess.run(
+                ["pdftoppm", "-png", "-r", "150", pdf_path, prefix],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            png_files = sorted(
+                [
+                    os.path.join(output_dir, f)
+                    for f in os.listdir(output_dir)
+                    if f.startswith("slide") and f.endswith(".png")
+                ],
+                key=lambda p: p,
+            )
+            if png_files:
+                print(f"pdftoppm generated {len(png_files)} PNG(s)")
+                return png_files
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+            print(f"pdftoppm failed ({e}), falling back to ImageMagick...")
+
+        # Fallback: ImageMagick convert
+        try:
+            out_pattern = os.path.join(output_dir, "slide-%d.png")
+            subprocess.run(
+                ["convert", "-density", "150", pdf_path, out_pattern],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            png_files = sorted(
+                [
+                    os.path.join(output_dir, f)
+                    for f in os.listdir(output_dir)
+                    if f.startswith("slide-") and f.endswith(".png")
+                ],
+                key=lambda p: p,
+            )
+            print(f"ImageMagick generated {len(png_files)} PNG(s)")
+            return png_files
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+            raise Exception(
+                f"Both pdftoppm and ImageMagick failed to convert PDF to PNG: {e}"
+            )
+
+    return await loop.run_in_executor(None, _convert)
+
+
 @PPTX_SLIDES_ROUTER.post("/process", response_model=PptxSlidesResponse)
 async def process_pptx_slides(
     pptx_file: UploadFile = File(..., description="PPTX file to process"),
@@ -338,9 +405,9 @@ async def process_pptx_slides(
             # Convert PPTX to PDF
             pdf_path = await _convert_pptx_to_pdf(pptx_path, temp_dir)
 
-            # Generate screenshots using LibreOffice
-            screenshot_paths = await DocumentsLoader.get_page_images_from_pdf_async(
-                pdf_path, temp_dir
+            # Generate PNG screenshots from PDF
+            screenshot_paths = await get_page_images_from_pdf_async(
+                pdf_path, os.path.dirname(pdf_path)
             )
             print(f"Screenshot paths: {screenshot_paths}")
 
