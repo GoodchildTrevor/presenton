@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import aiohttp
 import uuid
@@ -9,6 +10,9 @@ from utils.image_provider import (
 )
 from models.image_prompt import ImagePrompt
 from models.sql.image_asset import ImageAsset
+
+logger = logging.getLogger(__name__)
+
 
 class ImageGenerationService:
     def __init__(self, output_directory: str):
@@ -32,15 +36,15 @@ class ImageGenerationService:
         - Output Directory is used for saving the generated image.
         """
         if self.is_image_generation_disabled:
-            print("Image generation is disabled. Using placeholder image.")
+            logger.info("Генерация изображений отключена. Используется изображение-заглушка.")
             return "/static/images/placeholder.jpg"
 
         if not self.image_gen_func:
-            print("No image generation function found. Using placeholder image.")
+            logger.warning("Функция генерации изображений не найдена. Используется изображение-заглушка.")
             return "/static/images/placeholder.jpg"
 
         image_prompt = prompt.get_image_prompt(with_theme=True)
-        print(f"Request - Generating Image for {image_prompt}")
+        logger.info("Запрос на генерацию изображения: %s", image_prompt)
 
         try:
             image_path = await self.image_gen_func(
@@ -61,7 +65,7 @@ class ImageGenerationService:
             raise Exception(f"Image not found at {image_path}")
 
         except Exception as e:
-            print(f"Error generating image: {e}")
+            logger.exception("Ошибка при генерации изображения: %s", e)
             return "/static/images/placeholder.jpg"
 
     async def generate_image_flux(self, prompt: str, output_directory: str) -> str:
