@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 import json
+import logging
 import math
 import os
 import random
@@ -67,8 +68,21 @@ from utils.process_slides import (
 )
 import uuid
 
+logger = logging.getLogger(__name__)
 
 PRESENTATION_ROUTER = APIRouter(prefix="/presentation", tags=["Presentation"])
+
+# ---------------------------------------------------------------------------
+# Status messages (русский)
+# ---------------------------------------------------------------------------
+MSG_GENERATING_OUTLINES = "Генерация структуры презентации"
+MSG_SELECTING_LAYOUTS = "Выбор макета для каждого слайда"
+MSG_GENERATING_SLIDES = "Генерация слайдов"
+MSG_FETCHING_ASSETS = "Загрузка ресурсов для слайдов"
+MSG_EXPORTING = "Экспорт презентации"
+MSG_COMPLETED = "Генерация презентации завершена"
+MSG_FAILED = "Ошибка генерации презентации"
+MSG_QUEUED = "В очереди на генерацию"
 
 
 @PRESENTATION_ROUTER.get("/all", response_model=List[PresentationWithSlides])
@@ -449,7 +463,7 @@ async def check_if_api_request_is_valid(
     sql_session: AsyncSession = Depends(get_async_session),
 ) -> Tuple[uuid.UUID,]:
     presentation_id = uuid.uuid4()
-    print(f"Presentation ID: {presentation_id}")
+    logger.info("Presentation ID: %s", presentation_id)
 
     # Making sure either content, slides markdown or files is provided
     if not (request.content or request.slides_markdown or request.files):
@@ -505,7 +519,7 @@ async def generate_presentation_handler(
 
             # Updating async status
             if async_status:
-                async_status.message = "Generating presentation outlines"
+                async_status.message = MSG_GENERATING_OUTLINES
                 async_status.updated_at = datetime.now()
                 sql_session.add(async_status)
                 await sql_session.commit()
@@ -577,13 +591,12 @@ async def generate_presentation_handler(
 
         # Updating async status
         if async_status:
-            async_status.message = "Selecting layout for each slide"
+            async_status.message = MSG_SELECTING_LAYOUTS
             async_status.updated_at = datetime.now()
             sql_session.add(async_status)
             await sql_session.commit()
 
-        print("-" * 40)
-        print(f"Generated {total_outlines} outlines for the presentation")
+        logger.info("Сгенерировано %d outline(s) для презентации", total_outlines)
 
         # Parse Layouts
         layout_model = await get_layout_by_name(request.template)
@@ -665,7 +678,7 @@ async def generate_presentation_handler(
 
         # Updating async status
         if async_status:
-            async_status.message = "Generating slides"
+            async_status.message = MSG_GENERATING_SLIDES
             async_status.updated_at = datetime.now()
             sql_session.add(async_status)
             await sql_session.commit()
@@ -684,7 +697,7 @@ async def generate_presentation_handler(
         for start in range(0, len(slide_layouts), batch_size):
             end = min(start + batch_size, len(slide_layouts))
 
-            print(f"Generating slides from {start} to {end}")
+            logger.info("Генерация слайдов с %d по %d", start, end)
 
             # Generate contents for this batch concurrently
             content_tasks = [
@@ -724,7 +737,7 @@ async def generate_presentation_handler(
             async_assets_generation_tasks.extend(asset_tasks)
 
         if async_status:
-            async_status.message = "Fetching assets for slides"
+            async_status.message = MSG_FETCHING_ASSETS
             async_status.updated_at = datetime.now()
             sql_session.add(async_status)
             await sql_session.commit()
@@ -742,7 +755,7 @@ async def generate_presentation_handler(
         await sql_session.commit()
 
         if async_status:
-            async_status.message = "Exporting presentation"
+            async_status.message = MSG_EXPORTING
             async_status.updated_at = datetime.now()
             sql_session.add(async_status)
 
@@ -757,7 +770,7 @@ async def generate_presentation_handler(
         )
 
         if async_status:
-            async_status.message = "Presentation generation completed"
+            async_status.message = MSG_COMPLETED
             async_status.status = "completed"
             async_status.data = response.model_dump(mode="json")
             async_status.updated_at = datetime.now()
@@ -776,7 +789,7 @@ async def generate_presentation_handler(
 
     except Exception as e:
         if not isinstance(e, HTTPException):
-            traceback.print_exc()
+            logger.exception("Необработанная ошибка при генерации презентации")
             e = HTTPException(status_code=500, detail="Presentation generation failed")
 
         api_error_model = APIErrorModel.from_exception(e)
@@ -791,7 +804,7 @@ async def generate_presentation_handler(
 
         if async_status:
             async_status.status = "error"
-            async_status.message = "Presentation generation failed"
+            async_status.message = MSG_FAILED
             async_status.updated_at = datetime.now()
             async_status.error = api_error_model.model_dump(mode="json")
             sql_session.add(async_status)
@@ -812,7 +825,7 @@ async def generate_presentation_sync(
             request, presentation_id, None, sql_session
         )
     except Exception:
-        traceback.print_exc()
+        logger.exception("Ошибка при синхронной генерации презентации")
         raise HTTPException(status_code=500, detail="Presentation generation failed")
 
 
@@ -829,7 +842,7 @@ async def generate_presentation_async(
 
         async_status = AsyncPresentationGenerationTaskModel(
             status="pending",
-            message="Queued for generation",
+            message=MSG_QUEUED,
             data=None,
         )
         sql_session.add(async_status)
@@ -846,7 +859,7 @@ async def generate_presentation_async(
 
     except Exception as e:
         if not isinstance(e, HTTPException):
-            print(e)
+            logger.exception("Ошибка при постановке задачи генерации в очередь")
             e = HTTPException(status_code=500, detail="Presentation generation failed")
 
         raise e
